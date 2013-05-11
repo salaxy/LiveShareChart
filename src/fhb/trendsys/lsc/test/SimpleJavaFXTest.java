@@ -1,3 +1,4 @@
+package fhb.trendsys.lsc.test;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -11,7 +12,7 @@ import javafx.stage.Stage;
  * 
  * @author Salaxy
  */
-public class HelloFX extends Application {
+public class SimpleJavaFXTest extends Application {
 
 	/**
 	 * @param args
