@@ -1,13 +1,13 @@
-package fhb.trendsys.lsc.gui;
+package de.fhb.trendsys.lsc.gui;
 
+import de.fhb.trendsys.lsc.db.control.BusinessLogic;
+import de.fhb.trendsys.lsc.model.AppModel;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.stage.Stage;
-import fhb.trendsys.lsc.db.control.BusinessLogic;
-import fhb.trendsys.lsc.model.AppModel;
 
 /**
  * Mit dieser Klasse wird die JavaFX-Applikation gestartet,

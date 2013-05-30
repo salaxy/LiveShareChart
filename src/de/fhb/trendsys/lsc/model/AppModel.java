@@ -1,4 +1,4 @@
-package fhb.trendsys.lsc.model;
+package de.fhb.trendsys.lsc.model;
 
 import javafx.scene.chart.XYChart;
 

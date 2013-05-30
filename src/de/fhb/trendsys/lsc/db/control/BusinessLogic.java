@@ -1,6 +1,6 @@
-package fhb.trendsys.lsc.db.control;
+package de.fhb.trendsys.lsc.db.control;
 
-import fhb.trendsys.lsc.model.AppModel;
+import de.fhb.trendsys.lsc.model.AppModel;
 
 
 /**
@@ -9,6 +9,7 @@ import fhb.trendsys.lsc.model.AppModel;
  * verarbeitet und ins Model geschrieben.
  * 
  * @author Andy Klay <klay@fh-brandenburg.de>
+ * @author Frank Mertens
  */
 public class BusinessLogic {
 
