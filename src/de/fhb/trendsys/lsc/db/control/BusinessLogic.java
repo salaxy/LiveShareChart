@@ -1,5 +1,12 @@
 package de.fhb.trendsys.lsc.db.control;
 
+import java.util.List;
+import java.util.Map;
+
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+
+import de.fhb.trendsys.amazonfunctions.dynamodb.DynamoDBHandler;
 import de.fhb.trendsys.lsc.model.AppModel;
 
 
@@ -19,10 +26,24 @@ public class BusinessLogic {
 		this.model=model;
 	}
 	
-	public void refresh(){
+	public void refresh(int id){
+		Thread worker = new WorkerThread(id);
+		worker.run();
+	}
+	
+	private class WorkerThread extends Thread {
+		private DynamoDBHandler ddbClient;
+		private int id;
 		
-		//TODO Frank - Daten aktualsierung
+		public WorkerThread(int id) {
+			ddbClient = new DynamoDBHandler(Regions.EU_WEST_1, "stockdata");
+			this.id = id;
+		}
 		
+		public void run() {
+			List<Map<String, AttributeValue>> item = ddbClient.getAllItems(id);
+			
+		}
 	}
 
 }

@@ -2,6 +2,7 @@ package de.fhb.trendsys.amazonfunctions.dynamodb;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -12,11 +13,15 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.AttributeValueUpdate;
+import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
+import com.amazonaws.services.dynamodbv2.model.Condition;
 import com.amazonaws.services.dynamodbv2.model.DeleteItemRequest;
 import com.amazonaws.services.dynamodbv2.model.DescribeTableRequest;
 import com.amazonaws.services.dynamodbv2.model.GetItemRequest;
 import com.amazonaws.services.dynamodbv2.model.GetItemResult;
 import com.amazonaws.services.dynamodbv2.model.PutItemRequest;
+import com.amazonaws.services.dynamodbv2.model.QueryRequest;
+import com.amazonaws.services.dynamodbv2.model.QueryResult;
 import com.amazonaws.services.dynamodbv2.model.TableDescription;
 import com.amazonaws.services.dynamodbv2.model.UpdateItemRequest;
 
@@ -29,7 +34,6 @@ import com.amazonaws.services.dynamodbv2.model.UpdateItemRequest;
 public class DynamoDBHandler {
 	private AmazonDynamoDBClient ddbClient;
 	private String selectedTable;
-	public static final Region DEFAULT_REGION = Region.getRegion(Regions.EU_WEST_1);
 	
 	/**
 	 * Erzeugt einen Handler, der CRUD-Operationen für eine Tabelle in der Amazon DynamoDB zur Verfügung stellt.
@@ -78,6 +82,32 @@ public class DynamoDBHandler {
 		GetItemResult result = ddbClient.getItem(request);
 		
 		return result.getItem();		
+	}
+	
+	public List<Map<String, AttributeValue>> getAllItems(int id) {
+		Map<String, Condition> keyConditions = new HashMap<String, Condition>();
+		
+		Condition primaryKeyCondition = new Condition()
+									 .withComparisonOperator(ComparisonOperator.EQ)
+									 .withAttributeValueList(new AttributeValue()
+									 							 .withN(Integer.toString(id)));
+		keyConditions.put("id", primaryKeyCondition);
+		
+		long sinceYesterday = System.currentTimeMillis() - (System.currentTimeMillis() % 86400000L);
+		Condition rangeCondition = new Condition()
+									   .withComparisonOperator(ComparisonOperator.GT)
+									   .withAttributeValueList(new AttributeValue()
+									   							   .withS(Long.toString(sinceYesterday)));
+		keyConditions.put("timestamp", rangeCondition);
+		
+		QueryRequest request = new QueryRequest()
+								   .withTableName(selectedTable)
+								   .withKeyConditions(keyConditions)
+								   .withAttributesToGet("timestamp", "stock");
+		
+		QueryResult result = ddbClient.query(request);
+		
+		return result.getItems();
 	}
 	
 	/**

@@ -44,6 +44,10 @@ public class StockChart extends Application {
 
 		// TODO Andy - timeline / animation
 
+		
+		System.out.println("Refreshing...");
+		logic.refresh(1);
+		System.out.println("Refresh finished.");
 	}
 
 	protected LineChart<String, Number> createChart() {
