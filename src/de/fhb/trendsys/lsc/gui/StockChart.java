@@ -1,13 +1,14 @@
 package de.fhb.trendsys.lsc.gui;
 
-import de.fhb.trendsys.lsc.db.control.BusinessLogic;
-import de.fhb.trendsys.lsc.model.AppModel;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.stage.Stage;
+import de.fhb.trendsys.lsc.db.control.BusinessLogic;
+import de.fhb.trendsys.lsc.model.AppModel;
 
 /**
  * Mit dieser Klasse wird die JavaFX-Applikation gestartet,
@@ -21,7 +22,7 @@ public class StockChart extends Application {
 
 	private AppModel model;
 
-	private NumberAxis xAxis;
+	private CategoryAxis xAxis;
 	private NumberAxis yAxis;
 
 	@Override
@@ -36,29 +37,34 @@ public class StockChart extends Application {
 		logic = new BusinessLogic(model);
 
 		Group root = new Group();
-		stage.setScene(new Scene(root));
-		root.getChildren().add(createChart());
+		stage.setScene(new Scene(createChart()));
+//		root.getChildren().add(createChart());
+		
+//		 Scene scene  = new Scene(lineChart,800,600); 
 
 		// TODO Andy - timeline / animation
 
 	}
 
-	protected LineChart<Number, Number> createChart() {
+	protected LineChart<String, Number> createChart() {
 
-		xAxis = new NumberAxis(0, 20, 1);
-		yAxis = new NumberAxis(0, 100, 1);
+		xAxis = new CategoryAxis();
+//				(0, 20, 1);;
+		xAxis.setLabel("Time");
+		yAxis = new NumberAxis();
+//		yAxis = new NumberAxis(0, 100, 1);
 
-		LineChart<Number, Number> lineChart = new LineChart<Number, Number>(
+		LineChart<String, Number> lineChart = new LineChart<String, Number>(
 				xAxis, yAxis);
 
 		// linechrt config
 		lineChart.setId("Stockchart");
-		lineChart.setCreateSymbols(false);
-		lineChart.setAnimated(false);
-		lineChart.setLegendVisible(false);
+//		lineChart.setCreateSymbols(false);
+//		lineChart.setAnimated(false);
+		lineChart.setLegendVisible(true);
 		lineChart.setTitle("Live Share Chart");
 		xAxis.setLabel("Zeit");
-		// xAxis.setForceZeroInRange(false);
+//		xAxis.setForceZeroInRange(false);
 		yAxis.setLabel("Preis");
 		yAxis.setTickLabelFormatter(new NumberAxis.DefaultFormatter(yAxis, "$",
 				null));
