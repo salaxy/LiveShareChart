@@ -41,7 +41,7 @@ public class DynamoDBHandler {
 	 * @see DynamoDBHandler#getTableStatus()
 	 */
 	public DynamoDBHandler(Regions region, String tableName) {
-		AmazonDynamoDBClient ddbClient = new AmazonDynamoDBClient(new ClasspathPropertiesFileCredentialsProvider());
+		ddbClient = new AmazonDynamoDBClient(new ClasspathPropertiesFileCredentialsProvider());
 				
 		Region currentRegion = Region.getRegion(region);
 		ddbClient.setRegion(currentRegion);		
