@@ -1,5 +1,8 @@
 package de.fhb.trendsys.lsc.gui;
 
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.DocumentEvent.EventType;
+
 import javafx.animation.Interpolator;
 import javafx.animation.TranslateTransition;
 import javafx.animation.TranslateTransitionBuilder;
@@ -7,6 +10,7 @@ import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
@@ -15,6 +19,7 @@ import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
@@ -54,71 +59,67 @@ public class StockChart extends Application {
 
 		model = new AppModel();
 		logic = new BusinessLogic(model);
-		
-	    GridPane grid = new GridPane();
-	    grid.setHgap(10);
-	    grid.setVgap(10);
-	    grid.setPadding(new Insets(0, 10, 0, 10));
 
-		
-		
+		GridPane grid = new GridPane();
+		grid.setHgap(10);
+		grid.setVgap(10);
+		grid.setPadding(new Insets(0, 10, 0, 10));
 
 		Group root = new Group();
-//		root.getChildren().add(createChart());
-		
-		Scene scene = new Scene(root, 800, 600);
+		// root.getChildren().add(createChart());
+
+		Scene scene = new Scene(root, 1350, 650);
 
 		// stage.setScene(new Scene(createChart()));
 		// root.getChildren().add(createChart());
 		stage.setScene(scene);
-		
-//		 FlowPane flowPane = new FlowPane(2, 4);
-		
-//		 flowPane.setPrefWrapLength(200);
-		 
-//		HBox hBox = new HBox(3);
-//		VBox vbox = new VBox(3);
-		
-//		hBox.getChildren().add(createChart());
-		
-//		createNewsTicker(stage, root, hBox);
-//		createWebWindow();
-		
-//		root.getChildren().add(createChart(), );
-		grid.add(createChart(), 1, 0); 
-//		hBox.setAlignment(Pos.CENTER_LEFT);
-		
+
+		// FlowPane flowPane = new FlowPane(2, 4);
+
+		// flowPane.setPrefWrapLength(200);
+
+		// HBox hBox = new HBox(3);
+		// VBox vbox = new VBox(3);
+
+		// hBox.getChildren().add(createChart());
+
+		// createNewsTicker(stage, root, hBox);
+		// createWebWindow();
+
+		// root.getChildren().add(createChart(), );
+		grid.add(createChart(), 1, 1);
+		grid.add(createCoiceBox(),1,0);
+		// hBox.setAlignment(Pos.CENTER_LEFT);
+
 		Group webView = createWebWindow();
-//		webView.setLayoutX(2);
-//		webView.setLayoutY(2);
-//		webView.resize(100, 100);
-//		root.getChildren().add(webView);
+		// webView.setLayoutX(2);
+		// webView.setLayoutY(2);
+		// webView.resize(100, 100);
+		// root.getChildren().add(webView);
 		grid.addColumn(2, webView);
-//		grid.add(, 2, 1);
-//		hBox.setAlignment(Pos.CENTER_RIGHT);
-//		root.getChildren().add(createNewsTicker(stage, root));
 		
-//		vbox.getChildren().add(hBox);
-//		grid.getChildren().add(RectangleBuilder.create()
-//				.arcHeight(30).arcWidth(15).x(0).y(0)
-//				.fill(new Color(1, 1, 1, .55))
-//				.width(stage.getScene().getWidth() - 6).height(30)
-//				.stroke(Color.rgb(255, 255, 255, .70)).build());
-		
-		
-		Group newsTicker =createNewsTicker(stage, grid);
+		// grid.add(, 2, 1);
+		// hBox.setAlignment(Pos.CENTER_RIGHT);
+		// root.getChildren().add(createNewsTicker(stage, root));
+
+		// vbox.getChildren().add(hBox);
+		// grid.getChildren().add(RectangleBuilder.create()
+		// .arcHeight(30).arcWidth(15).x(0).y(0)
+		// .fill(new Color(1, 1, 1, .55))
+		// .width(stage.getScene().getWidth() - 6).height(30)
+		// .stroke(Color.rgb(255, 255, 255, .70)).build());
+
+		Group newsTicker = createNewsTicker(stage, grid);
 		newsTicker.toFront();
-//		newsTicker.setBlendMode(BlendMode.COLOR_BURN);
+		// newsTicker.setBlendMode(BlendMode.COLOR_BURN);
 		root.getChildren().add(newsTicker);
 		root.getChildren().add(grid);
-		
-//		vbox.setAlignment(Pos.BOTTOM_CENTER);
-//		flowPane.getChildren().add(createNewsTicker(stage, root));
-		
-		
+
+		// vbox.setAlignment(Pos.BOTTOM_CENTER);
+		// flowPane.getChildren().add(createNewsTicker(stage, root));
 
 		// TODO Andy - timeline / animation
-		
+
 		System.out.println(webView.getBoundsInParent());
 
 		System.out.println("Refreshing...");
@@ -140,8 +141,8 @@ public class StockChart extends Application {
 				.fill(new Color(0, 0, 0, .55))
 				.width(stage.getScene().getWidth() - 6).height(30)
 				.stroke(Color.rgb(255, 255, 255, .70)).build();
-		
-//		tickerRect.setPickOnBounds(arg0)
+
+		// tickerRect.setPickOnBounds(arg0)
 
 		javafx.scene.shape.Rectangle clipRegion = RectangleBuilder.create()
 				.arcHeight(20).arcWidth(15).x(0).y(0)
@@ -158,37 +159,16 @@ public class StockChart extends Application {
 		clipRegion.widthProperty().bind(scene.widthProperty().subtract(16));
 		tickerArea.getChildren().add(tickerRect);
 
-//		hBox.getChildren().add(tickerArea);
-//		root.getChildren().add(tickerArea);
+		// hBox.getChildren().add(tickerArea);
+		// root.getChildren().add(tickerArea);
 
 		// add text
 
 		Text news = TextBuilder
 				.create()
-				.text("Java FX 2.0 News | tomorrow 85 °F and sunny| :)"
-						+ " ++++ "
-						+ "DAX	8.241	-1,3% " 
-						+ " ++++ "
-						+ " 	Dow	15.116	-1,4% " 
-						+ " ++++ "
-						+ " 	Euro	1,3021	0,2%"
-						+ " ++++ "
-						+ "ESt50	2.738	-1,1% " 
-						+ " ++++ "
-						+ " 	Nas	3.456	-1,0% " 
-						+ " ++++ "
-						+ " 	Öl	100,1	0,0%"
-						+ " ++++ "
-						+ "TDax	949,7	-1,6%  " 
-						+ " ++++ "
-						+ "Nikkei	13.262	-3,7%  	"
-						+ " ++++ "
-						+ "Gold	1.399	0,8%"
-						+ "Java FX 2.0 News | 85 Grad and Sunny| :)"
-						+ "Java FX 2.0 News | 85 Grad and Sunny| :)"
-						+ "Java FX 2.0 News | 85 Grad and Sunny| :)")
+				.text(this.model.getActualNewsFeeds())
 				.translateY(18).fill(Color.WHITE).build();
-		
+
 		tickerArea.getChildren().add(news);
 
 		final TranslateTransition tickerAnimation = TranslateTransitionBuilder
@@ -212,54 +192,54 @@ public class StockChart extends Application {
 		});
 
 		tickerAnimation.play();
-		
+
 		return tickerArea;
 	}
-	
-//	public FlowPane addFlowPane() {
-//	    FlowPane flow = new FlowPane();
-//	    flow.setPadding(new Insets(5, 0, 5, 0));
-//	    flow.setVgap(4);
-//	    flow.setHgap(4);
-//	    flow.setPrefWrapLength(170); // preferred width allows for two columns
-//	    flow.setStyle("-fx-background-color: DAE6F3;");
-//
-//	    ImageView pages[] = new ImageView[8];
-//	    for (int i=0; i<8; i++) {
-//	        pages[i] = new ImageView(
-//	            new Image(LayoutSample.class.getResourceAsStream(
-//	            "graphics/chart_"+(i+1)+".png")));
-//	        flow.getChildren().add(pages[i]);
-//	    }
-//
-//	    return flow;
-//	}
+
+	// public FlowPane addFlowPane() {
+	// FlowPane flow = new FlowPane();
+	// flow.setPadding(new Insets(5, 0, 5, 0));
+	// flow.setVgap(4);
+	// flow.setHgap(4);
+	// flow.setPrefWrapLength(170); // preferred width allows for two columns
+	// flow.setStyle("-fx-background-color: DAE6F3;");
+	//
+	// ImageView pages[] = new ImageView[8];
+	// for (int i=0; i<8; i++) {
+	// pages[i] = new ImageView(
+	// new Image(LayoutSample.class.getResourceAsStream(
+	// "graphics/chart_"+(i+1)+".png")));
+	// flow.getChildren().add(pages[i]);
+	// }
+	//
+	// return flow;
+	// }
 
 	protected Group createWebWindow() {
 
 		Group web = new Group();
-//		primaryStage.setScene(new Scene(root));
+		// primaryStage.setScene(new Scene(root));
 
 		WebView webView = new WebView();
-		webView.prefHeight(100);
-		webView.prefWidth(100);
-		webView.maxHeight(100);
-		webView.maxWidth(100);
-		webView.minHeight(50);
-		webView.minWidth(50);
-		
-//		webView.setLayoutX(2);
-//		webView.setLayoutY(2);
-//		webView.resize(200, 200);
-//		webView.autosize();
+//		webView.prefHeight(100);
+//		webView.prefWidth(100);
+//		webView.maxHeight(100);
+//		webView.maxWidth(100);
+//		webView.minHeight(50);
+//		webView.minWidth(50);
+
+		// webView.setLayoutX(2);
+		// webView.setLayoutY(2);
+		// webView.resize(200, 200);
+		// webView.autosize();
 
 		final WebEngine webEngine = webView.getEngine();
 
-//		webEngine.load(DEFAULT_URL);
-		
-		webEngine.load("http://javafx.com");        
-        
-        webEngine.loadContent("<b>asdf</b>");
+		// webEngine.load(DEFAULT_URL);
+
+		webEngine.load(model.getActualOpenedNewsURL());
+
+//		webEngine.loadContent("<b>asdf</b>");
 
 		final TextField locationField = new TextField(DEFAULT_URL);
 
@@ -275,7 +255,8 @@ public class StockChart extends Application {
 			@Override
 			public void handle(ActionEvent event) {
 
-				webEngine.load(locationField.getText().startsWith("http://") ? locationField
+				webEngine
+						.load(locationField.getText().startsWith("http://") ? locationField
 								.getText() : "http://"
 								+ locationField.getText());
 			}
@@ -288,37 +269,67 @@ public class StockChart extends Application {
 		goButton.setDefaultButton(true);
 
 		goButton.setOnAction(goAction);
-		
+
 		System.out.println(webView.getHeight() + " " + webView.getWidth());
 
 		// Layout logic
 
-//		 HBox hBox = new HBox(5);
-//		
-//		 hBox.getChildren().setAll(locationField, goButton);
-		
-//		 HBox.setHgrow(locationField, Priority.ALWAYS);
-		
-		
-//		 VBox vBox = new VBox(5);
-//		
-//		 vBox.getChildren().setAll(hBox, webView);
-		
-		
-//		 VBox.setVgrow(webView, Priority.ALWAYS);
-		
-//		 root.getChildren().add(webView);
-		
-//		hBox.getChildren().add(webView);
-		
+		// HBox hBox = new HBox(5);
+		//
+		// hBox.getChildren().setAll(locationField, goButton);
+
+		// HBox.setHgrow(locationField, Priority.ALWAYS);
+
+		// VBox vBox = new VBox(5);
+		//
+		// vBox.getChildren().setAll(hBox, webView);
+
+		// VBox.setVgrow(webView, Priority.ALWAYS);
+
+		// root.getChildren().add(webView);
+
+		// hBox.getChildren().add(webView);
+
 		webView.toBack();
 		web.getChildren().add(webView);
-		
+
 		return web;
 	}
-	
-	
-	
+
+	protected ChoiceBox<String> createCoiceBox(){
+		
+		
+	       ChoiceBox<String> cb = new ChoiceBox<String>();
+
+	       for(String actual : this.model.getStockNames()){
+	    	cb.getItems().add(actual);
+	       }
+
+	        cb.getSelectionModel().selectFirst();
+	        cb.valueProperty().addListener(new ChangeListener<String>(){
+
+				@Override
+				public void changed(final ObservableValue<? extends String> arg0,
+						final String arg1, final String arg2) {
+					// TODO Auto-generated method stub
+//					value=arg2;
+					
+				}
+	        	
+	        });
+//	        cb.addEventHandler(EventType.CHANGE, new EventHandler<ChangeEvent>(){
+//
+//				@Override
+//				public void handle(Event arg0) {
+//					// TODO Auto-generated method stub
+//					
+//				}
+//	        	
+//			});
+			return cb;
+
+//	        root.getChildren().add(cb);
+	}
 
 	protected LineChart<String, Number> createChart() {
 
