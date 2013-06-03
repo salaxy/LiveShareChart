@@ -41,18 +41,18 @@ public class AppModel {
 //		dataSeries.getData().add(new XYChart.Data(12, 22));
 		
 		
-//		dataSeries.getData().add(new XYChart.Data("Jan", 23));
-//        dataSeries.getData().add(new XYChart.Data("Feb", 14));
-//        dataSeries.getData().add(new XYChart.Data("Mar", 15));
-//        dataSeries.getData().add(new XYChart.Data("Apr", 24));
-//        dataSeries.getData().add(new XYChart.Data("May", 34));
-//        dataSeries.getData().add(new XYChart.Data("Jun", 36));
-//        dataSeries.getData().add(new XYChart.Data("Jul", 22));
-//        dataSeries.getData().add(new XYChart.Data("Aug", 45));
-//        dataSeries.getData().add(new XYChart.Data("Sep", 43));
-//        dataSeries.getData().add(new XYChart.Data("Oct", 17));
-//        dataSeries.getData().add(new XYChart.Data("Nov", 29));
-//        dataSeries.getData().add(new XYChart.Data("Dec", 25));
+		dataSeries.getData().add(new XYChart.Data("Jan", 23));
+        dataSeries.getData().add(new XYChart.Data("Feb", 14));
+        dataSeries.getData().add(new XYChart.Data("Mar", 15));
+        dataSeries.getData().add(new XYChart.Data("Apr", 24));
+        dataSeries.getData().add(new XYChart.Data("May", 34));
+        dataSeries.getData().add(new XYChart.Data("Jun", 36));
+        dataSeries.getData().add(new XYChart.Data("Jul", 22));
+        dataSeries.getData().add(new XYChart.Data("Aug", 45));
+        dataSeries.getData().add(new XYChart.Data("Sep", 43));
+        dataSeries.getData().add(new XYChart.Data("Oct", 17));
+        dataSeries.getData().add(new XYChart.Data("Nov", 29));
+        dataSeries.getData().add(new XYChart.Data("Dec", 25));
 
 	}
 	
