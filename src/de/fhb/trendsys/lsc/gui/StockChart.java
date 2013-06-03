@@ -60,10 +60,10 @@ public class StockChart extends Application {
 		model = new AppModel();
 		logic = new BusinessLogic(model);
 
-		GridPane grid = new GridPane();
-		grid.setHgap(10);
-		grid.setVgap(10);
-		grid.setPadding(new Insets(0, 10, 0, 10));
+//		GridPane grid = new GridPane();
+//		grid.setHgap(10);
+//		grid.setVgap(10);
+//		grid.setPadding(new Insets(0, 10, 0, 10));
 
 		Group root = new Group();
 		// root.getChildren().add(createChart());
@@ -87,16 +87,36 @@ public class StockChart extends Application {
 		// createWebWindow();
 
 		// root.getChildren().add(createChart(), );
-		grid.add(createChart(), 1, 1);
-		grid.add(createCoiceBox(),1,0);
+//		grid.add(createChart(), 1, 1);
+//		grid.add(createCoiceBox(),1,0);
+		
+		LineChart<String, Number> chart = createChart();
+		chart.setLayoutX(20);
+		chart.setLayoutY(10);
+		chart.prefHeight(200);
+		chart.setPrefSize(600, 600);
+		
+		
+		ChoiceBox<String> choice = createCoiceBox();
+	       choice.setLayoutX(10);
+	       choice.setLayoutY(10);
+	       
+	       
+	       root.getChildren().add(chart);
+	       root.getChildren().add(choice);
+		
 		// hBox.setAlignment(Pos.CENTER_LEFT);
 
 		Group webView = createWebWindow();
-		// webView.setLayoutX(2);
-		// webView.setLayoutY(2);
+		 webView.setLayoutX(610);
+		 webView.setLayoutY(10);
+//		 webView.prefHeight(200);
+//		 webView.prefWidth(200); 
 		// webView.resize(100, 100);
 		// root.getChildren().add(webView);
-		grid.addColumn(2, webView);
+//		grid.addColumn(2, webView);
+		
+		root.getChildren().add(webView);
 		
 		// grid.add(, 2, 1);
 		// hBox.setAlignment(Pos.CENTER_RIGHT);
@@ -109,11 +129,11 @@ public class StockChart extends Application {
 		// .width(stage.getScene().getWidth() - 6).height(30)
 		// .stroke(Color.rgb(255, 255, 255, .70)).build());
 
-		Group newsTicker = createNewsTicker(stage, grid);
+		Group newsTicker = createNewsTicker(stage);
 		newsTicker.toFront();
 		// newsTicker.setBlendMode(BlendMode.COLOR_BURN);
 		root.getChildren().add(newsTicker);
-		root.getChildren().add(grid);
+//		root.getChildren().add(grid);
 
 		// vbox.setAlignment(Pos.BOTTOM_CENTER);
 		// flowPane.getChildren().add(createNewsTicker(stage, root));
@@ -127,7 +147,7 @@ public class StockChart extends Application {
 		System.out.println("Refresh finished.");
 	}
 
-	protected Group createNewsTicker(Stage stage, GridPane root) {
+	protected Group createNewsTicker(Stage stage) {
 
 		Group tickerArea = new Group();
 
@@ -300,9 +320,10 @@ public class StockChart extends Application {
 		
 		
 	       ChoiceBox<String> cb = new ChoiceBox<String>();
+	       
 
 	       for(String actual : this.model.getStockNames()){
-	    	cb.getItems().add(actual);
+	    	   cb.getItems().add(actual);
 	       }
 
 	        cb.getSelectionModel().selectFirst();

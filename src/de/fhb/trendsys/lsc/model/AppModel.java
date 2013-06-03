@@ -74,6 +74,7 @@ public class AppModel {
 
 		dataSeries = new XYChart.Series<String, Number>();
 		dataSeries.setName("AktieXY");
+		avaiableStockData.add(dataSeries);
 
 		// create some data
 //		dataSeries.getData().add(new XYChart.Data(1, 22));
