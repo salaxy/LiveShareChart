@@ -8,8 +8,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Pos;
-import javafx.scene.DepthTest;
+import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.chart.CategoryAxis;
@@ -17,10 +16,7 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.scene.effect.BlendMode;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.RectangleBuilder;
 import javafx.scene.text.Text;
@@ -58,6 +54,14 @@ public class StockChart extends Application {
 
 		model = new AppModel();
 		logic = new BusinessLogic(model);
+		
+	    GridPane grid = new GridPane();
+	    grid.setHgap(10);
+	    grid.setVgap(10);
+	    grid.setPadding(new Insets(0, 10, 0, 10));
+
+		
+		
 
 		Group root = new Group();
 //		root.getChildren().add(createChart());
@@ -72,33 +76,41 @@ public class StockChart extends Application {
 		
 //		 flowPane.setPrefWrapLength(200);
 		 
-		HBox hBox = new HBox(3);
-		VBox vbox = new VBox(2);
+//		HBox hBox = new HBox(3);
+//		VBox vbox = new VBox(3);
 		
 //		hBox.getChildren().add(createChart());
 		
 //		createNewsTicker(stage, root, hBox);
 //		createWebWindow();
 		
-		hBox.getChildren().add(createChart());
+//		root.getChildren().add(createChart(), );
+		grid.add(createChart(), 1, 0); 
 //		hBox.setAlignment(Pos.CENTER_LEFT);
-		hBox.getChildren().add(createWebWindow());
+		
+		Group webView = createWebWindow();
+//		webView.setLayoutX(2);
+//		webView.setLayoutY(2);
+//		webView.resize(100, 100);
+//		root.getChildren().add(webView);
+		grid.addColumn(2, webView);
+//		grid.add(, 2, 1);
 //		hBox.setAlignment(Pos.CENTER_RIGHT);
 //		root.getChildren().add(createNewsTicker(stage, root));
 		
-		vbox.getChildren().add(hBox);
-		vbox.getChildren().add(RectangleBuilder.create()
-				.arcHeight(30).arcWidth(15).x(0).y(0)
-				.fill(new Color(0, 0, 0, .55))
-				.width(stage.getScene().getWidth() - 6).height(30)
-				.stroke(Color.rgb(255, 255, 255, .70)).build());
+//		vbox.getChildren().add(hBox);
+//		grid.getChildren().add(RectangleBuilder.create()
+//				.arcHeight(30).arcWidth(15).x(0).y(0)
+//				.fill(new Color(1, 1, 1, .55))
+//				.width(stage.getScene().getWidth() - 6).height(30)
+//				.stroke(Color.rgb(255, 255, 255, .70)).build());
 		
 		
-		Group newsTicker =createNewsTicker(stage, root);
+		Group newsTicker =createNewsTicker(stage, grid);
 		newsTicker.toFront();
 //		newsTicker.setBlendMode(BlendMode.COLOR_BURN);
-		vbox.getChildren().add(newsTicker);
-		root.getChildren().add(vbox);
+		root.getChildren().add(newsTicker);
+		root.getChildren().add(grid);
 		
 //		vbox.setAlignment(Pos.BOTTOM_CENTER);
 //		flowPane.getChildren().add(createNewsTicker(stage, root));
@@ -106,13 +118,15 @@ public class StockChart extends Application {
 		
 
 		// TODO Andy - timeline / animation
+		
+		System.out.println(webView.getBoundsInParent());
 
 		System.out.println("Refreshing...");
 		// logic.refresh(1);
 		System.out.println("Refresh finished.");
 	}
 
-	protected Group createNewsTicker(Stage stage, Group root) {
+	protected Group createNewsTicker(Stage stage, GridPane root) {
 
 		Group tickerArea = new Group();
 
@@ -221,9 +235,9 @@ public class StockChart extends Application {
 //	    return flow;
 //	}
 
-	protected WebView createWebWindow() {
+	protected Group createWebWindow() {
 
-//		Group root = new Group();
+		Group web = new Group();
 //		primaryStage.setScene(new Scene(root));
 
 		WebView webView = new WebView();
@@ -234,14 +248,18 @@ public class StockChart extends Application {
 		webView.minHeight(50);
 		webView.minWidth(50);
 		
-		webView.setLayoutX(2);
-		webView.setLayoutY(2);
-		webView.resize(200, 200);
+//		webView.setLayoutX(2);
+//		webView.setLayoutY(2);
+//		webView.resize(200, 200);
 //		webView.autosize();
 
 		final WebEngine webEngine = webView.getEngine();
 
-		webEngine.load(DEFAULT_URL);
+//		webEngine.load(DEFAULT_URL);
+		
+		webEngine.load("http://javafx.com");        
+        
+        webEngine.loadContent("<b>asdf</b>");
 
 		final TextField locationField = new TextField(DEFAULT_URL);
 
@@ -270,6 +288,8 @@ public class StockChart extends Application {
 		goButton.setDefaultButton(true);
 
 		goButton.setOnAction(goAction);
+		
+		System.out.println(webView.getHeight() + " " + webView.getWidth());
 
 		// Layout logic
 
@@ -292,9 +312,13 @@ public class StockChart extends Application {
 //		hBox.getChildren().add(webView);
 		
 		webView.toBack();
+		web.getChildren().add(webView);
 		
-		return webView;
+		return web;
 	}
+	
+	
+	
 
 	protected LineChart<String, Number> createChart() {
 
