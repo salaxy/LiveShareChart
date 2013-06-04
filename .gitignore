@@ -1,7 +1,6 @@
 /bin
 /bin/*
 *.class
-*.jar
 *.war
 *.ear
 .classpath
