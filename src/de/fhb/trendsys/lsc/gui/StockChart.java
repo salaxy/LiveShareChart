@@ -1,12 +1,22 @@
 package de.fhb.trendsys.lsc.gui;
 
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+
+import com.sun.javafx.collections.ObservableListWrapper;
+
 import javafx.animation.Interpolator;
 import javafx.animation.TranslateTransition;
 import javafx.animation.TranslateTransitionBuilder;
 import javafx.application.Application;
+import javafx.beans.InvalidationListener;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Side;
@@ -15,6 +25,7 @@ import javafx.scene.Scene;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ListView;
@@ -48,6 +59,8 @@ public class StockChart extends Application {
 	private NumberAxis yAxis;
 
 	public static final String DEFAULT_URL = "http://www.oracle.com/us/index.html";
+	
+	LineChart<String, Number> lineChart;
 
 	@Override
 	public void start(Stage stage) throws Exception {
@@ -397,8 +410,19 @@ public class StockChart extends Application {
 
 			@Override
 			public void changed(final ObservableValue<? extends String> arg0,
-					final String arg1, final String arg2) {
+					final String arg1, final String name) {
 				// TODO Auto-generated method stub
+				System.out.println(name);
+				
+				if(model.changeActualDataSeries(name)){
+					
+					lineChart.setTitle(name);
+					lineChart.setUserData(model.getActualDataSeries());
+//					lineChart.getData().remove(0, lineChart.getData().size()-1);
+//					lineChart.getData().add(model.getActualDataSeries());
+//					lineChart.setData();
+				}
+					
 				// value=arg2;
 
 			}
@@ -424,17 +448,18 @@ public class StockChart extends Application {
 		// (0, 20, 1);;
 		xAxis.setLabel("Time");
 		yAxis = new NumberAxis();
-		// yAxis = new NumberAxis(0, 100, 1);
+		 yAxis = new NumberAxis(0, 100, 1);
 
-		LineChart<String, Number> lineChart = new LineChart<String, Number>(
+		lineChart = new LineChart<String, Number>(
 				xAxis, yAxis);
 
 		// linechrt config
 		lineChart.setId("Stockchart");
 		// lineChart.setCreateSymbols(false);
-		// lineChart.setAnimated(false);
+		lineChart.setAnimated(false);
 		lineChart.setLegendVisible(false);
-		lineChart.setTitle(this.model.getDataSeries().getName());
+//		lineChart.setTitle(this.model.getActualDataSeries().getName());
+		lineChart.setTitle("no stock loaded");
 		xAxis.setLabel("Zeit");
 		// xAxis.setForceZeroInRange(false);
 		yAxis.setLabel("Preis");
@@ -442,7 +467,7 @@ public class StockChart extends Application {
 				null));
 
 		// Daten mit linechart verknuepfen - Databinding
-		lineChart.getData().add(model.getDataSeries());
+//		lineChart.getData().add(model.getActualDataSeries());
 
 		return lineChart;
 	}

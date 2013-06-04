@@ -58,8 +58,12 @@ public class BusinessLogic {
 					else
 						stockValue = Double.parseDouble(item.getValue().getS());
 				}
-				
-				model.getDataSeries().getData().add(new XYChart.Data<String, Number>(timeStamp, stockValue));
+				//TODO hier dürfen wirklich nur neue Daten hinzu kommen,
+				//denn deshalb entsteht die Verbindung von letzten zum neuen Punkt
+				//also TEST was war der letzte wert, ab da an alle neuen Werte holen
+				//und in den aktuellen Datensatz schreiben
+				if(model.getActualDataSeries()!=null)
+				model.getActualDataSeries().getData().add(new XYChart.Data<String, Number>(timeStamp, stockValue));
 			}
 				
 		}

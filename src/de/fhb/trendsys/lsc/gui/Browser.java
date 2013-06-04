@@ -15,30 +15,20 @@ public class Browser extends Region {
 	final WebEngine webEngine = browser.getEngine();
 
 	public Browser() {
-		// apply the styles
-//		getStyleClass().add("browser");
-		// load the web page
 		webEngine.load("http://www.oracle.com/products/index.html");
-		// add the web view to the scene
 		getChildren().add(browser);
-
 	}
-	
-	public Browser(double height, double width) {		
+
+	public Browser(double height, double width) {
 		this();
 		myHeight = height;
 		myWidth = width;
 	}
 
-	// private Node createSpacer() {
-	// Region spacer = new Region();
-	// HBox.setHgrow(spacer, Priority.ALWAYS);
-	// return spacer;
-	// }
-
 	@Override
 	protected void layoutChildren() {
-		layoutInArea(browser, 0, 0, getWidth(), getHeight(), 0, HPos.CENTER, VPos.CENTER);
+		layoutInArea(browser, 0, 0, getWidth(), getHeight(), 0, HPos.CENTER,
+				VPos.CENTER);
 	}
 
 	@Override
