@@ -65,28 +65,26 @@ public class StockChart extends Application {
 		// grid.setVgap(10);
 		// grid.setPadding(new Insets(0, 10, 0, 10));
 
+		final TabPane tabPane = new TabPane();
+		tabPane.setPrefSize(950, 650);
+		tabPane.setSide(Side.TOP);
+		tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 
-        final TabPane tabPane = new TabPane();
-        tabPane.setPrefSize(950, 650);
-        tabPane.setSide(Side.TOP);
-        tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+		final Tab chartTab = new Tab();
+		chartTab.setText("Chart");
 
-        final Tab chartTab = new Tab();
-        chartTab.setText("Chart");
+		final Tab webTab = new Tab();
+		webTab.setText("WebView");
 
-        final Tab webTab = new Tab();
-        webTab.setText("WebView");
-        
-        tabPane.getTabs().addAll(chartTab, webTab);
-        Group chartTabGroup = new Group();
-        Group webTabGroup = new Group();
-        
-        chartTab.setContent(chartTabGroup);
+		tabPane.getTabs().addAll(chartTab, webTab);
+		Group chartTabGroup = new Group();
+		Group webTabGroup = new Group();
+
+		chartTab.setContent(chartTabGroup);
 		Group root = new Group();
 		// root.getChildren().add(createChart());
 
 		Scene scene = new Scene(root, 950, 650);
-		
 
 		// stage.setScene(new Scene(createChart()));
 		// root.getChildren().add(createChart());
@@ -123,39 +121,55 @@ public class StockChart extends Application {
 		listView.setLayoutY(10);
 		listView.setPrefSize(300, 500);
 
+		final Button button = new Button("Red");
+//		button.setStyle("-fx-base: red;");
+
+		button.setLayoutX(200);
+		button.setLayoutY(10);
+		
+		
+		button.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                
+            	button.setText("abgeschickt");
+            	logic.refresh(1);
+                
+            }
+
+        });
 
 		
 		chartTabGroup.getChildren().add(chart);
 		chartTabGroup.getChildren().add(choice);
-//		chartTab.add(chart);
-//		chartTab.getChildren().add(choice);
+		chartTabGroup.getChildren().add(button);
+		// chartTab.add(chart);
+		// chartTab.getChildren().add(choice);
 
 		// hBox.setAlignment(Pos.CENTER_LEFT);
 
-//		Group webView = createWebWindow();
-//		webView.setLayoutX(610);
-//		webView.setLayoutY(10);
-//		webView.autosize();
-//		webView.prefHeight(200);
-//		webView.prefWidth(200);
+		// Group webView = createWebWindow();
+		// webView.setLayoutX(610);
+		// webView.setLayoutY(10);
+		// webView.autosize();
+		// webView.prefHeight(200);
+		// webView.prefWidth(200);
 		// webView.resize(100, 100);
 		// root.getChildren().add(webView);
 		// grid.addColumn(2, webView);
 
-//		root.getChildren().add(webView);
-//		root.getChildren().add(listView);
-		Browser webView= new Browser();
-		webTabGroup.getChildren().add(new Browser(600,950));
-		
+		// root.getChildren().add(webView);
+		// root.getChildren().add(listView);
+
+		Browser webView = new Browser();
+		webTabGroup.getChildren().add(new Browser(600, 950));
+
 		webTab.setContent(webTabGroup);
 		webView.layout();
 		webTabGroup.autoSizeChildrenProperty().set(true);
 		webTabGroup.autosize();
-//		webView.getParent().prefWidth(100);
-//		webView.getParent().autosize();
-		
-		
-		
+		// webView.getParent().prefWidth(100);
+		// webView.getParent().autosize();
+
 		chartTabGroup.getChildren().add(listView);
 
 		// grid.add(, 2, 1);
@@ -184,7 +198,7 @@ public class StockChart extends Application {
 		System.out.println(webView.getBoundsInParent());
 
 		System.out.println("Refreshing...");
-		// logic.refresh(1);
+		logic.refresh(1);
 		System.out.println("Refresh finished.");
 	}
 
@@ -208,9 +222,6 @@ public class StockChart extends Application {
 		Group tickerArea = new Group();
 
 		final Scene scene = stage.getScene();
-
-		Button button = new Button("Red");
-		button.setStyle("-fx-base: red;");
 
 		javafx.scene.shape.Rectangle tickerRect = RectangleBuilder.create()
 				.arcHeight(20).arcWidth(15).x(0).y(0)
@@ -329,7 +340,8 @@ public class StockChart extends Application {
 			@Override
 			public void handle(ActionEvent event) {
 
-				webEngine.load(locationField.getText().startsWith("http://") ? locationField
+				webEngine
+						.load(locationField.getText().startsWith("http://") ? locationField
 								.getText() : "http://"
 								+ locationField.getText());
 			}
@@ -364,10 +376,10 @@ public class StockChart extends Application {
 		// hBox.getChildren().add(webView);
 
 		webView.toBack();
-//		web.getChildren().add(webView);
-//		Region r = new Region();
-//		r.getChildrenUnmodifiable().add(webView);
-//		r.layout()
+		// web.getChildren().add(webView);
+		// Region r = new Region();
+		// r.getChildrenUnmodifiable().add(webView);
+		// r.layout()
 
 		return web;
 	}
