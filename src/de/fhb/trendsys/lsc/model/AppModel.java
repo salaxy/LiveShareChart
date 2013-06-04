@@ -105,10 +105,10 @@ public class AppModel {
 		numberSeries.getData().add(new XYChart.Data("4", 23));
 		numberSeries.getData().add(new XYChart.Data("5", 35));
 		numberSeries.getData().add(new XYChart.Data("6", 33));
-		numberSeries.getData().add(new XYChart.Data("7", 24));
+		numberSeries.getData().add(new XYChart.Data("7", 40));
 		numberSeries.getData().add(new XYChart.Data("8", 44));
-		numberSeries.getData().add(new XYChart.Data("9", 40));
-		numberSeries.getData().add(new XYChart.Data("10", 16));
+		numberSeries.getData().add(new XYChart.Data("9", 35));
+		numberSeries.getData().add(new XYChart.Data("10", 30));
 		numberSeries.getData().add(new XYChart.Data("11", 28));
 		numberSeries.getData().add(new XYChart.Data("12", 22));
 		

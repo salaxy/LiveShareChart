@@ -62,6 +62,7 @@ public class BusinessLogic {
 				//denn deshalb entsteht die Verbindung von letzten zum neuen Punkt
 				//also TEST was war der letzte wert, ab da an alle neuen Werte holen
 				//und in den aktuellen Datensatz schreiben
+				//ODER alternativ alle CHART daten, bei 3 sample Aktien oder so, recht performance unkritisch 
 				if(model.getActualDataSeries()!=null)
 				model.getActualDataSeries().getData().add(new XYChart.Data<String, Number>(timeStamp, stockValue));
 			}
