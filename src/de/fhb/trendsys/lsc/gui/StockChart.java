@@ -1,18 +1,15 @@
 package de.fhb.trendsys.lsc.gui;
 
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.DocumentEvent.EventType;
-
 import javafx.animation.Interpolator;
 import javafx.animation.TranslateTransition;
 import javafx.animation.TranslateTransitionBuilder;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
+import javafx.geometry.Side;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.chart.CategoryAxis;
@@ -20,8 +17,11 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ListView;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.RectangleBuilder;
 import javafx.scene.text.Text;
@@ -60,19 +60,38 @@ public class StockChart extends Application {
 		model = new AppModel();
 		logic = new BusinessLogic(model);
 
-//		GridPane grid = new GridPane();
-//		grid.setHgap(10);
-//		grid.setVgap(10);
-//		grid.setPadding(new Insets(0, 10, 0, 10));
+		// GridPane grid = new GridPane();
+		// grid.setHgap(10);
+		// grid.setVgap(10);
+		// grid.setPadding(new Insets(0, 10, 0, 10));
 
+
+        final TabPane tabPane = new TabPane();
+        tabPane.setPrefSize(950, 650);
+        tabPane.setSide(Side.TOP);
+        tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+
+        final Tab chartTab = new Tab();
+        chartTab.setText("Chart");
+
+        final Tab webTab = new Tab();
+        webTab.setText("WebView");
+        
+        tabPane.getTabs().addAll(chartTab, webTab);
+        Group chartTabGroup = new Group();
+        Group webTabGroup = new Group();
+        
+        chartTab.setContent(chartTabGroup);
 		Group root = new Group();
 		// root.getChildren().add(createChart());
 
-		Scene scene = new Scene(root, 1350, 650);
+		Scene scene = new Scene(root, 950, 650);
+		
 
 		// stage.setScene(new Scene(createChart()));
 		// root.getChildren().add(createChart());
 		stage.setScene(scene);
+		stage.setResizable(false);
 
 		// FlowPane flowPane = new FlowPane(2, 4);
 
@@ -87,37 +106,58 @@ public class StockChart extends Application {
 		// createWebWindow();
 
 		// root.getChildren().add(createChart(), );
-//		grid.add(createChart(), 1, 1);
-//		grid.add(createCoiceBox(),1,0);
-		
+		// grid.add(createChart(), 1, 1);
+		// grid.add(createCoiceBox(),1,0);
+
 		LineChart<String, Number> chart = createChart();
 		chart.setLayoutX(20);
 		chart.setLayoutY(10);
-		chart.prefHeight(200);
 		chart.setPrefSize(600, 600);
-		
-		
+
 		ChoiceBox<String> choice = createCoiceBox();
-	       choice.setLayoutX(10);
-	       choice.setLayoutY(10);
-	       
-	       
-	       root.getChildren().add(chart);
-	       root.getChildren().add(choice);
+		choice.setLayoutX(10);
+		choice.setLayoutY(10);
+
+		ListView<String> listView = createListView();
+		listView.setLayoutX(610);
+		listView.setLayoutY(10);
+		listView.setPrefSize(300, 500);
+
+
 		
+		chartTabGroup.getChildren().add(chart);
+		chartTabGroup.getChildren().add(choice);
+//		chartTab.add(chart);
+//		chartTab.getChildren().add(choice);
+
 		// hBox.setAlignment(Pos.CENTER_LEFT);
 
-		Group webView = createWebWindow();
-		 webView.setLayoutX(610);
-		 webView.setLayoutY(10);
-//		 webView.prefHeight(200);
-//		 webView.prefWidth(200); 
+//		Group webView = createWebWindow();
+//		webView.setLayoutX(610);
+//		webView.setLayoutY(10);
+//		webView.autosize();
+//		webView.prefHeight(200);
+//		webView.prefWidth(200);
 		// webView.resize(100, 100);
 		// root.getChildren().add(webView);
-//		grid.addColumn(2, webView);
+		// grid.addColumn(2, webView);
+
+//		root.getChildren().add(webView);
+//		root.getChildren().add(listView);
+		Browser webView= new Browser();
+		webTabGroup.getChildren().add(new Browser(600,950));
 		
-		root.getChildren().add(webView);
+		webTab.setContent(webTabGroup);
+		webView.layout();
+		webTabGroup.autoSizeChildrenProperty().set(true);
+		webTabGroup.autosize();
+//		webView.getParent().prefWidth(100);
+//		webView.getParent().autosize();
 		
+		
+		
+		chartTabGroup.getChildren().add(listView);
+
 		// grid.add(, 2, 1);
 		// hBox.setAlignment(Pos.CENTER_RIGHT);
 		// root.getChildren().add(createNewsTicker(stage, root));
@@ -132,8 +172,9 @@ public class StockChart extends Application {
 		Group newsTicker = createNewsTicker(stage);
 		newsTicker.toFront();
 		// newsTicker.setBlendMode(BlendMode.COLOR_BURN);
+		root.getChildren().add(tabPane);
 		root.getChildren().add(newsTicker);
-//		root.getChildren().add(grid);
+		// root.getChildren().add(grid);
 
 		// vbox.setAlignment(Pos.BOTTOM_CENTER);
 		// flowPane.getChildren().add(createNewsTicker(stage, root));
@@ -145,6 +186,21 @@ public class StockChart extends Application {
 		System.out.println("Refreshing...");
 		// logic.refresh(1);
 		System.out.println("Refresh finished.");
+	}
+
+	protected ListView<String> createListView() {
+
+		final ListView<String> listView = new ListView<String>();
+		listView.setItems(FXCollections.observableArrayList(
+
+		"Row 1", "Row 2", "Long Row 3", "Row 4", "Row 5", "Row 6", "Row 7",
+				"Row 8", "Row 9", "Row 10", "Row 11", "Row 12", "Row 13",
+				"Row 14", "Row 15", "Row 16", "Row 17", "Row 18", "Row 19",
+				"Row 20"
+
+		));
+
+		return listView;
 	}
 
 	protected Group createNewsTicker(Stage stage) {
@@ -184,9 +240,7 @@ public class StockChart extends Application {
 
 		// add text
 
-		Text news = TextBuilder
-				.create()
-				.text(this.model.getActualNewsFeeds())
+		Text news = TextBuilder.create().text(this.model.getActualNewsFeeds())
 				.translateY(18).fill(Color.WHITE).build();
 
 		tickerArea.getChildren().add(news);
@@ -241,12 +295,12 @@ public class StockChart extends Application {
 		// primaryStage.setScene(new Scene(root));
 
 		WebView webView = new WebView();
-//		webView.prefHeight(100);
-//		webView.prefWidth(100);
-//		webView.maxHeight(100);
-//		webView.maxWidth(100);
-//		webView.minHeight(50);
-//		webView.minWidth(50);
+		// webView.prefHeight(100);
+		// webView.prefWidth(100);
+		// webView.maxHeight(100);
+		// webView.maxWidth(100);
+		// webView.minHeight(50);
+		// webView.minWidth(50);
 
 		// webView.setLayoutX(2);
 		// webView.setLayoutY(2);
@@ -259,7 +313,7 @@ public class StockChart extends Application {
 
 		webEngine.load(model.getActualOpenedNewsURL());
 
-//		webEngine.loadContent("<b>asdf</b>");
+		// webEngine.loadContent("<b>asdf</b>");
 
 		final TextField locationField = new TextField(DEFAULT_URL);
 
@@ -275,8 +329,7 @@ public class StockChart extends Application {
 			@Override
 			public void handle(ActionEvent event) {
 
-				webEngine
-						.load(locationField.getText().startsWith("http://") ? locationField
+				webEngine.load(locationField.getText().startsWith("http://") ? locationField
 								.getText() : "http://"
 								+ locationField.getText());
 			}
@@ -311,45 +364,46 @@ public class StockChart extends Application {
 		// hBox.getChildren().add(webView);
 
 		webView.toBack();
-		web.getChildren().add(webView);
+//		web.getChildren().add(webView);
+//		Region r = new Region();
+//		r.getChildrenUnmodifiable().add(webView);
+//		r.layout()
 
 		return web;
 	}
 
-	protected ChoiceBox<String> createCoiceBox(){
-		
-		
-	       ChoiceBox<String> cb = new ChoiceBox<String>();
-	       
+	protected ChoiceBox<String> createCoiceBox() {
 
-	       for(String actual : this.model.getStockNames()){
-	    	   cb.getItems().add(actual);
-	       }
+		ChoiceBox<String> cb = new ChoiceBox<String>();
 
-	        cb.getSelectionModel().selectFirst();
-	        cb.valueProperty().addListener(new ChangeListener<String>(){
+		for (String actual : this.model.getStockNames()) {
+			cb.getItems().add(actual);
+		}
 
-				@Override
-				public void changed(final ObservableValue<? extends String> arg0,
-						final String arg1, final String arg2) {
-					// TODO Auto-generated method stub
-//					value=arg2;
-					
-				}
-	        	
-	        });
-//	        cb.addEventHandler(EventType.CHANGE, new EventHandler<ChangeEvent>(){
-//
-//				@Override
-//				public void handle(Event arg0) {
-//					// TODO Auto-generated method stub
-//					
-//				}
-//	        	
-//			});
-			return cb;
+		cb.getSelectionModel().selectFirst();
+		cb.valueProperty().addListener(new ChangeListener<String>() {
 
-//	        root.getChildren().add(cb);
+			@Override
+			public void changed(final ObservableValue<? extends String> arg0,
+					final String arg1, final String arg2) {
+				// TODO Auto-generated method stub
+				// value=arg2;
+
+			}
+
+		});
+		// cb.addEventHandler(EventType.CHANGE, new EventHandler<ChangeEvent>(){
+		//
+		// @Override
+		// public void handle(Event arg0) {
+		// // TODO Auto-generated method stub
+		//
+		// }
+		//
+		// });
+		return cb;
+
+		// root.getChildren().add(cb);
 	}
 
 	protected LineChart<String, Number> createChart() {
@@ -367,8 +421,8 @@ public class StockChart extends Application {
 		lineChart.setId("Stockchart");
 		// lineChart.setCreateSymbols(false);
 		// lineChart.setAnimated(false);
-		lineChart.setLegendVisible(true);
-		lineChart.setTitle("Live Share Chart");
+		lineChart.setLegendVisible(false);
+		lineChart.setTitle(this.model.getDataSeries().getName());
 		xAxis.setLabel("Zeit");
 		// xAxis.setForceZeroInRange(false);
 		yAxis.setLabel("Preis");
