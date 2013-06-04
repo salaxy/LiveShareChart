@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jel>
+	<admin creation="Fri Dec 30 06:05:13 EST 2011" xsdversion="1.0.0" version="1.0.0" />
+	<jelclass superclass="Object" visibility="public" package="javaxt.rss" superclassfulltype="java.lang.Object" fulltype="javaxt.rss.Parser" type="Parser">
+		<comment>
+			<description>Used to parse an RSS document and create a list of feeds/channels.</description>
+		</comment>
+		<methods>
+			<constructor visibility="public" name="Parser">
+				<comment>
+					<description>Creates a new instance of the RSS Parser</description>
+				</comment>
+				<params>
+					<param name="doc" fulltype="org.w3c.dom.Document" type="Document" />
+				</params>
+			</constructor>
+			<method visibility="public" name="getFeeds" fulltype="javaxt.rss.Feed[]" type="Feed">
+				<comment>
+					<description>Returns an array of &quot;feeds&quot;. A &quot;feed&quot; in RSS is a called a &quot;channel&quot;</description>
+				</comment>
+			</method>
+			<method static="true" visibility="protected" name="getOuterNode" fulltype="org.w3c.dom.Node" type="Node">
+				<comment>
+					<description>Returns the outer node for a given xml document.</description>
+					<attribute name="@param">
+						<description>xml A org.w3c.dom.Document</description>
+					</attribute>
+				</comment>
+				<params>
+					<param name="xml" comment="A org.w3c.dom.Document" fulltype="org.w3c.dom.Document" type="Document" />
+				</params>
+			</method>
+			<method static="true" visibility="protected" name="getAttributeValue" fulltype="java.lang.String" type="String">
+				<comment>
+					<description>Used to return the value of a given node attribute. The search is case
+   insensitive. If no match is found, returns an empty string.</description>
+				</comment>
+				<params>
+					<param name="node" fulltype="org.w3c.dom.Node" type="Node" />
+					<param name="attrName" fulltype="java.lang.String" type="String" />
+				</params>
+			</method>
+			<method static="true" visibility="protected" name="getNodeValue" fulltype="java.lang.String" type="String">
+				<comment>
+					<description>Returns the value of a given node as text.</description>
+				</comment>
+				<params>
+					<param name="node" fulltype="org.w3c.dom.Node" type="Node" />
+				</params>
+			</method>
+			<method static="true" visibility="protected" name="getAttributes" fulltype="java.lang.String" type="String">
+				<comment>
+					<description>Used to retrieve all of the attributes for a given node.</description>
+				</comment>
+				<params>
+					<param name="node" fulltype="org.w3c.dom.Node" type="Node" />
+				</params>
+			</method>
+			<method static="true" visibility="protected" name="getDate" fulltype="java.util.Date" type="Date">
+				<comment>
+					<description>Used to convert a string to a date</description>
+				</comment>
+				<params>
+					<param name="date" fulltype="java.lang.String" type="String" />
+				</params>
+				<exceptions>
+					<exception fulltype="java.text.ParseException" type="ParseException" />
+				</exceptions>
+			</method>
+		</methods>
+	</jelclass>
+	<jelclass superclass="Object" visibility="public" package="javaxt.rss" superclassfulltype="java.lang.Object" fulltype="javaxt.rss.Media" type="Media">
+		<comment>
+			<description>Used to parse a media content node associated with an RSS entry</description>
+		</comment>
+		<methods>
+			<constructor visibility="protected" name="Media">
+				<comment>
+					<description>Creates a new instance of Media.</description>
+				</comment>
+				<params>
+					<param name="node" fulltype="org.w3c.dom.Node" type="Node" />
+				</params>
+			</constructor>
+			<method visibility="public" name="getType" fulltype="java.lang.String" type="String" />
+			<method visibility="public" name="getCredit" fulltype="java.lang.String" type="String" />
+			<method visibility="public" name="getDescription" fulltype="java.lang.String" type="String" />
+			<method visibility="public" name="getLink" fulltype="java.net.URL" type="URL" />
+			<method visibility="public" name="toString" fulltype="java.lang.String" type="String" />
+		</methods>
+	</jelclass>
+	<jelclass superclass="Object" visibility="public" package="javaxt.rss" superclassfulltype="java.lang.Object" fulltype="javaxt.rss.Location" type="Location">
+		<comment>
+			<description>Used to represent a location information associated with an RSS feed or
+   entry. Supports GeoRSS and W3C Basic Geometry.</description>
+		</comment>
+		<methods>
+			<constructor visibility="protected" name="Location">
+				<comment>
+					<description>Creates a new instance of this class using an XML node.</description>
+				</comment>
+				<params>
+					<param name="node" fulltype="org.w3c.dom.Node" type="Node" />
+					<param name="namespaces" fulltype="java.util.HashMap" type="HashMap" />
+				</params>
+			</constructor>
+			<constructor visibility="protected" name="Location">
+				<comment>
+					<description>Creates a new instance of this class using a point.</description>
+				</comment>
+				<params>
+					<param name="lat" fulltype="java.lang.String" type="String" />
+					<param name="lon" fulltype="java.lang.String" type="String" />
+				</params>
+			</constructor>
+			<method visibility="public" name="toWKT" fulltype="java.lang.String" type="String">
+				<comment>
+					<description>Used to return a Well-known Text (WKT) representation of the location.</description>
+				</comment>
+			</method>
+			<method visibility="public" name="toString" fulltype="java.lang.String" type="String">
+				<comment>
+					<description>Used to return a Well-known Text (WKT) representation of the location.</description>
+				</comment>
+			</method>
+			<method visibility="public" name="getGeometry" returncomment="Returns a javaxt.geospatial.geometry.Geometry or a
+  com.vividsolutions.jts.geom.Geometry, depending on which library is found
+  in the classpath. If both libraries are present, will return a
+  javaxt.geospatial.geometry.Geometry object." fulltype="java.lang.Object" type="Object">
+				<comment>
+					<description>Used convert the location into a geometry object.</description>
+					<attribute name="@return">
+						<description>Returns a javaxt.geospatial.geometry.Geometry or a
+  com.vividsolutions.jts.geom.Geometry, depending on which library is found
+  in the classpath. If both libraries are present, will return a
+  javaxt.geospatial.geometry.Geometry object.</description>
+					</attribute>
+				</comment>
+			</method>
+			<method static="true" visibility="protected" name="isLocationNode" fulltype="boolean" type="boolean">
+				<comment>
+					<description>Protected method used to help determine whether a node represents a
+   location.</description>
+				</comment>
+				<params>
+					<param name="nodeName" fulltype="java.lang.String" type="String" />
+					<param name="namespaces" fulltype="java.util.HashMap" type="HashMap" />
+				</params>
+			</method>
+		</methods>
+	</jelclass>
+	<jelclass superclass="Object" visibility="public" package="javaxt.rss" superclassfulltype="java.lang.Object" fulltype="javaxt.rss.Item" type="Item">
+		<comment>
+			<description>Used to represent an entry in an RSS feed.</description>
+		</comment>
+		<methods>
+			<constructor visibility="protected" name="Item">
+				<comment>
+					<description>Creates a new instance of this class using an XML node.</description>
+				</comment>
+				<params>
+					<param name="node" fulltype="org.w3c.dom.Node" type="Node" />
+					<param name="namespaces" fulltype="java.util.HashMap" type="HashMap" />
+				</params>
+			</constructor>
+			<method visibility="public" name="getTitle" fulltype="java.lang.String" type="String" />
+			<method visibility="public" name="getDescription" fulltype="java.lang.String" type="String" />
+			<method visibility="public" name="getAuthor" fulltype="java.lang.String" type="String" />
+			<method visibility="public" name="getLink" fulltype="java.net.URL" type="URL">
+				<comment>
+					<description>Returns a link/url associated with the current entry. Returns the
+   &apos;feedburner:origLink&apos; if found. Otherwise returns a url associated with
+   the &apos;link&apos; node.</description>
+				</comment>
+			</method>
+			<method visibility="public" name="getDate" fulltype="java.util.Date" type="Date">
+				<comment>
+					<description>Return the date/time stamp associated with the current entry. Uses the
+   pubDate if it exists. Otherwise, returns dc:date</description>
+				</comment>
+			</method>
+			<method visibility="public" name="getMedia" fulltype="javaxt.rss.Media[]" type="Media">
+				<comment>
+					<description>Returns an array of media items associated with the current entry.</description>
+				</comment>
+			</method>
+			<method visibility="public" name="getLocation" fulltype="javaxt.rss.Location" type="Location">
+				<comment>
+					<description>Returns location information associated with the current entry (e.g.
+  GeoRSS element).</description>
+				</comment>
+			</method>
+			<method visibility="public" name="getNodeList" fulltype="org.w3c.dom.NodeList" type="NodeList" />
+			<method visibility="public" name="toString" fulltype="java.lang.String" type="String" />
+		</methods>
+	</jelclass>
+	<jelclass superclass="Object" visibility="public" package="javaxt.rss" superclassfulltype="java.lang.Object" fulltype="javaxt.rss.Feed" type="Feed">
+		<comment>
+			<description>Used to represent an RSS feed/channel. Returns a list of entries and other
+   attributes associated with the feed.</description>
+		</comment>
+		<methods>
+			<constructor visibility="protected" name="Feed">
+				<comment>
+					<description>Creates a new instance of this class using an XML node.</description>
+				</comment>
+				<params>
+					<param name="node" fulltype="org.w3c.dom.Node" type="Node" />
+					<param name="namespaces" fulltype="java.util.HashMap" type="HashMap" />
+				</params>
+			</constructor>
+			<method visibility="public" name="getTitle" fulltype="java.lang.String" type="String" />
+			<method visibility="public" name="getDescription" fulltype="java.lang.String" type="String" />
+			<method visibility="public" name="getLink" fulltype="java.net.URL" type="URL" />
+			<method visibility="public" name="getItems" fulltype="javaxt.rss.Item[]" type="Item">
+				<comment>
+					<description>Returns a list of items found in an RSS feed.</description>
+				</comment>
+			</method>
+			<method visibility="public" name="getLocation" fulltype="javaxt.rss.Location" type="Location">
+				<comment>
+					<description>Returns location information associated with the current feed (e.g.
+  GeoRSS element).</description>
+				</comment>
+			</method>
+			<method visibility="public" name="getLastUpdate" fulltype="java.util.Date" type="Date" />
+			<method visibility="public" name="getRefreshInterval" fulltype="java.lang.Integer" type="Integer">
+				<comment>
+					<description>Returns the number of minutes that the channel can be cached before
+  refreshing from the source. Derived from the ttl tag in RSS feeds.
+  Returns null if the refresh interval is not specified or unknown.</description>
+				</comment>
+			</method>
+			<method visibility="public" name="toString" fulltype="java.lang.String" type="String" />
+		</methods>
+	</jelclass>
+</jel>
