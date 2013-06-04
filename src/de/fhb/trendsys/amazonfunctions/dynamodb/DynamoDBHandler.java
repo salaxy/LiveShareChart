@@ -69,6 +69,7 @@ public class DynamoDBHandler {
 	 * 
 	 * @param id Primärschlüssel des Tupels
 	 * @return Tupel
+	 * @see DynamoDBHandler#getAllItems(int)
 	 * @see DynamoDBHandler#addItem(int, Map)
 	 * @see DynamoDBHandler#deleteItem(int)
 	 * @see DynamoDBHandler#updateItem(int, Map)
@@ -84,6 +85,11 @@ public class DynamoDBHandler {
 		return result.getItem();		
 	}
 	
+	/**
+	 * Fragt alle Tupel ab, die dieselbe ID haben und deren Erstellungsdatum heute ist.
+	 * @param id Primärschlüssel des Tupels
+	 * @return Liste aller passenden Tupel
+	 */
 	public List<Map<String, AttributeValue>> getAllItems(int id) {
 		Map<String, Condition> keyConditions = new HashMap<String, Condition>();
 		
