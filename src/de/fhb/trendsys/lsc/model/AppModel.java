@@ -20,8 +20,6 @@ public class AppModel {
 	
 	private String actualStock="AktieXY";
 	
-//	private String actualNewsFeeds= " News ... +++";
-	
 	//TODO FRank wir brauchen heir Datenpaare, da hgaben wir doch schon nen Datenformat oder
 	// der Titel + Link beinhaltet
 	private List<FeedVO> actualNewsFeeds;
@@ -67,10 +65,6 @@ public class AppModel {
 	public List<FeedVO> getActualNewsFeeds() {
 		return actualNewsFeeds;
 	}
-
-//	public void setActualNewsFeeds(List<FeedVO> actualNewsFeeds) {
-//		this.actualNewsFeeds = actualNewsFeeds;
-//	}
 
 	public String getActualOpenedNewsURL() {
 		return actualOpenedNewsURL;
@@ -149,11 +143,11 @@ public class AppModel {
 //		+ " Gold	1.399	0,8%";
 		
 		this.actualNewsFeeds= new ArrayList<FeedVO>();
-		actualNewsFeeds.add(new FeedVO("Da fliegt er wech!","http://www.tagesschau.de/inland/eurohawk152.html"));
-		actualNewsFeeds.add(new FeedVO("Hochwasser OMG!","http://www.tagesschau.de/inland/hochwasser1142.html"));
-		actualNewsFeeds.add(new FeedVO("Diktator at work!","http://www.tagesschau.de/ausland/eu-erdogan100.html"));
-		actualNewsFeeds.add(new FeedVO("Check this out!","http://www.tagesschau.de/inland/geheimdienste110.html"));
-		actualNewsFeeds.add(new FeedVO("Whats going on in Berlin!","http://www.rbb-online.de/nachrichten/politik/2013_06/obama_besuch_sorgt_fuer_ausnahmezustand.html"));
+		actualNewsFeeds.add(new FeedVO("Flying away, amaizing machines!","http://www.tagesschau.de/inland/eurohawk152.html"));
+		actualNewsFeeds.add(new FeedVO("Water, water annnd water again!","http://www.tagesschau.de/inland/hochwasser1142.html"));
+		actualNewsFeeds.add(new FeedVO("Dictator at work!","http://www.tagesschau.de/ausland/eu-erdogan100.html"));
+		actualNewsFeeds.add(new FeedVO("Check thisss out!","http://www.tagesschau.de/inland/geheimdienste110.html"));
+		actualNewsFeeds.add(new FeedVO("Whats going on in Berlin, master of masters is coming!","http://www.rbb-online.de/nachrichten/politik/2013_06/obama_besuch_sorgt_fuer_ausnahmezustand.html"));
 		
 	}
 	

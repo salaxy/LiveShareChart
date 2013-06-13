@@ -1,5 +1,8 @@
 package de.fhb.trendsys.lsc.gui;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.animation.Interpolator;
 import javafx.animation.TranslateTransition;
 import javafx.animation.TranslateTransitionBuilder;
@@ -11,6 +14,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Side;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
@@ -18,12 +22,14 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Hyperlink;
+import javafx.scene.control.HyperlinkBuilder;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.Tooltip;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.RectangleBuilder;
-import javafx.scene.text.Text;
 import javafx.scene.text.TextBuilder;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -189,46 +195,63 @@ public class StockChart extends Application {
 		// add text
 //		Text news = TextBuilder.create().text(this.model.getActualNewsFeeds())
 //				.translateY(18).fill(Color.WHITE).build();
-
 //		tickerArea.getChildren().add(news);
 		
-//		List Hyperlink
+		//experimental Hyperlink	
+		List<Node> hyperlinks= new ArrayList<Node>();
 		
-		for(FeedVO feed: this.model.getActualNewsFeeds()){
-			new Hyperlink(feed.getTitle());
+		//erzeuge Hyperlinks mit Listener und fuege sie der Liste hinzu
+		for(final FeedVO feed: this.model.getActualNewsFeeds()){
+			
+			Hyperlink actualLink = HyperlinkBuilder.create()
+			.textFill(Color.WHITE)
+			.text(feed.getTitle())
+			.translateY(3)
+			.tooltip(new Tooltip("Blablubb Tooltip"))
+			.build();
+			
+			
+			actualLink.setOnAction(new EventHandler<ActionEvent>() {
+	            @Override
+	            public void handle(ActionEvent e) {
+	            	System.out.println("This link is clicked: " + feed.getUrl());
+	            	tabPane.getSelectionModel().select(webTab);
+	            	webContainer.webEngine.load(feed.getUrl());
+	            }
+	        });
+			
+			hyperlinks.add(actualLink);
+			hyperlinks.add(TextBuilder
+					.create()
+					.text("  +++++  ")
+					.translateY(3)
+					.fill(Color.WHITE).build());
 			
 		}
-		
-		
-		//experimental Hyperlink
 		
 		Group tickerStripe= new Group();
 		tickerStripe.setLayoutX(0);
 		tickerStripe.setLayoutY(0);
+		FlowPane tickerFlow = new FlowPane();
+		tickerFlow.setPrefWrapLength(2000);
+		tickerStripe.getChildren().add(tickerFlow);
+		tickerFlow.getChildren().addAll(hyperlinks);
 		
-		Hyperlink hpl = new Hyperlink("Golem-Test");
-		
-		tickerStripe.getChildren().add(hpl);
-//		tickerStripe.getChildren().add(news);
-		
-		tabPane.getSelectionModel().select(webTab);
-		webContainer.webEngine.load("http://www.oracle.com/us/support/index.html");
-		
-        hpl.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-            	System.out.println("This link is clicked");
-//            	tabPane.getSelectionModel().select(webTab);
-//            	webContainer.loadanotherUrl("http://www.finanzen.net/");
-            	webContainer.webEngine.load("http://www.oracle.com/us/support/index.html");
-//            	webContainer.getWebEngine().load("http://www.oracle.com/us/support/index.html");
-//            	System.out.println(webContainer.getWebEngine().getLoadWorker().isRunning());
-//            	webContainer.getWebEngine().reload();
-//            	webContainer.getWebView().getEngine().load("http://www.golem.de");
-//            	webContainer.getWebView().layout()
-//            	webContainer.layoutChildren();
-            }
-        });
+//        hpl.setOnAction(new EventHandler<ActionEvent>() {
+//            @Override
+//            public void handle(ActionEvent e) {
+//            	System.out.println("This link is clicked");
+////            	tabPane.getSelectionModel().select(webTab);
+////            	webContainer.loadanotherUrl("http://www.finanzen.net/");
+//            	webContainer.webEngine.load("http://www.oracle.com/us/support/index.html");
+////            	webContainer.getWebEngine().load("http://www.oracle.com/us/support/index.html");
+////            	System.out.println(webContainer.getWebEngine().getLoadWorker().isRunning());
+////            	webContainer.getWebEngine().reload();
+////            	webContainer.getWebView().getEngine().load("http://www.golem.de");
+////            	webContainer.getWebView().layout()
+////            	webContainer.layoutChildren();
+//            }
+//        });
 		
         tickerArea.getChildren().add(tickerStripe);
 		
@@ -237,7 +260,7 @@ public class StockChart extends Application {
 		final TranslateTransition tickerAnimation = TranslateTransitionBuilder
 				.create().node(tickerStripe)
 				.duration(Duration.millis((scene.getWidth() / 300) * 15000))
-//				.fromX(scene.widthProperty().doubleValue()).fromY(19)
+				.fromX(scene.widthProperty().doubleValue()).fromY(10)
 				.fromX(scene.widthProperty().doubleValue()).fromY(0)
 				.toX(-scene.widthProperty().doubleValue())
 				.interpolator(Interpolator.LINEAR).cycleCount(1).build();

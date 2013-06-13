@@ -16,7 +16,7 @@ public class FeedVO {
 	public void setTitle(String title) {
 		this.title = title;
 	}
-	public FeedVO(String url, String title) {
+	public FeedVO(String title, String url) {
 		super();
 		this.url = url;
 		this.title = title;
