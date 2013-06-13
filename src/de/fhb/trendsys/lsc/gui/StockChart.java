@@ -17,6 +17,7 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -28,6 +29,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import de.fhb.trendsys.lsc.db.control.BusinessLogic;
 import de.fhb.trendsys.lsc.model.AppModel;
+import de.fhb.trendsys.lsc.model.FeedVO;
 
 /**
  * Mit dieser Klasse wird die JavaFX-Applikation gestartet, Sie beinhaltet
@@ -51,7 +53,7 @@ public class StockChart extends Application {
 	private Tab webTab;
 	private Group chartTabGroup;
 	private Group webTabGroup;
-	private Browser webView;
+	private Browser webContainer;
 
 	@Override
 	public void start(Stage stage) throws Exception {
@@ -91,7 +93,10 @@ public class StockChart extends Application {
 		stage.setScene(scene);
 		stage.setResizable(false);
 
-		initTabs(root);
+		initTabs(root);		
+		
+		webContainer = new Browser();
+		webTabGroup.getChildren().add(new Browser(600, 950));
 
 		LineChart<String, Number> chart = createChart();
 		chart.setLayoutX(20);
@@ -105,13 +110,10 @@ public class StockChart extends Application {
 		chartTabGroup.getChildren().add(choice);
 
 		ListView<String> listView = createListView();
-		listView.setLayoutX(610);
-		listView.setLayoutY(10);
-		listView.setPrefSize(300, 500);
+		listView.setLayoutX(620);
+		listView.setLayoutY(45);
+		listView.setPrefSize(300, 525);
 		chartTabGroup.getChildren().add(listView);
-
-		webView = new Browser();
-		webTabGroup.getChildren().add(new Browser(600, 950));
 
 		Group newsTicker = createNewsTicker(stage);
 		newsTicker.toFront();
@@ -136,6 +138,8 @@ public class StockChart extends Application {
 		System.out.println("Refreshing...");
 		logic.refresh(1);
 		System.out.println("Refresh finished.");
+		
+		webContainer.getWebEngine().load("http://www.oracle.com/us/support/index.html");
 	}
 
 	protected ListView<String> createListView() {
@@ -183,15 +187,58 @@ public class StockChart extends Application {
 		tickerArea.getChildren().add(tickerRect);
 
 		// add text
-		Text news = TextBuilder.create().text(this.model.getActualNewsFeeds())
-				.translateY(18).fill(Color.WHITE).build();
+//		Text news = TextBuilder.create().text(this.model.getActualNewsFeeds())
+//				.translateY(18).fill(Color.WHITE).build();
 
-		tickerArea.getChildren().add(news);
+//		tickerArea.getChildren().add(news);
+		
+//		List Hyperlink
+		
+		for(FeedVO feed: this.model.getActualNewsFeeds()){
+			new Hyperlink(feed.getTitle());
+			
+		}
+		
+		
+		//experimental Hyperlink
+		
+		Group tickerStripe= new Group();
+		tickerStripe.setLayoutX(0);
+		tickerStripe.setLayoutY(0);
+		
+		Hyperlink hpl = new Hyperlink("Golem-Test");
+		
+		tickerStripe.getChildren().add(hpl);
+//		tickerStripe.getChildren().add(news);
+		
+		tabPane.getSelectionModel().select(webTab);
+		webContainer.webEngine.load("http://www.oracle.com/us/support/index.html");
+		
+        hpl.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+            	System.out.println("This link is clicked");
+//            	tabPane.getSelectionModel().select(webTab);
+//            	webContainer.loadanotherUrl("http://www.finanzen.net/");
+            	webContainer.webEngine.load("http://www.oracle.com/us/support/index.html");
+//            	webContainer.getWebEngine().load("http://www.oracle.com/us/support/index.html");
+//            	System.out.println(webContainer.getWebEngine().getLoadWorker().isRunning());
+//            	webContainer.getWebEngine().reload();
+//            	webContainer.getWebView().getEngine().load("http://www.golem.de");
+//            	webContainer.getWebView().layout()
+//            	webContainer.layoutChildren();
+            }
+        });
+		
+        tickerArea.getChildren().add(tickerStripe);
+		
+		
 
 		final TranslateTransition tickerAnimation = TranslateTransitionBuilder
-				.create().node(news)
+				.create().node(tickerStripe)
 				.duration(Duration.millis((scene.getWidth() / 300) * 15000))
-				.fromX(scene.widthProperty().doubleValue()).fromY(19)
+//				.fromX(scene.widthProperty().doubleValue()).fromY(19)
+				.fromX(scene.widthProperty().doubleValue()).fromY(0)
 				.toX(-scene.widthProperty().doubleValue())
 				.interpolator(Interpolator.LINEAR).cycleCount(1).build();
 

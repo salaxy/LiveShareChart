@@ -2,6 +2,9 @@ package de.fhb.trendsys.lsc.gui;
 
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
+import javafx.scene.Node;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
@@ -15,7 +18,8 @@ public class Browser extends Region {
 	final WebEngine webEngine = browser.getEngine();
 
 	public Browser() {
-		webEngine.load("http://www.oracle.com/products/index.html");
+//		webEngine.load("http://www.oracle.com/products/index.html");
+		webEngine.load("http://www.computerbase.de");
 		getChildren().add(browser);
 	}
 
@@ -25,11 +29,26 @@ public class Browser extends Region {
 		myWidth = width;
 	}
 
+	public WebView getWebView() {
+		return browser;
+	}
+
+	public WebEngine getWebEngine() {
+		return webEngine;
+	}
+
 	@Override
 	protected void layoutChildren() {
 		layoutInArea(browser, 0, 0, getWidth(), getHeight(), 0, HPos.CENTER,
 				VPos.CENTER);
 	}
+	
+//    @SuppressWarnings("unused")
+//	private Node createSpacer() {
+//        Region spacer = new Region();
+//        HBox.setHgrow(spacer, Priority.ALWAYS);
+//        return spacer;
+//    }
 
 	@Override
 	protected double computePrefWidth(double height) {
@@ -44,5 +63,9 @@ public class Browser extends Region {
 	public void setSize(double height, double width) {
 		myHeight = height;
 		myWidth = width;
+	}
+	
+	public void loadanotherUrl(String url){
+		browser.getEngine().load(url);
 	}
 }
