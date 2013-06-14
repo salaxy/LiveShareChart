@@ -101,8 +101,8 @@ public class StockChart extends Application {
 
 		initTabs(root);		
 		
-		webContainer = new Browser();
-		webTabGroup.getChildren().add(new Browser(600, 950));
+		webContainer = new Browser(600, 950);
+		webTabGroup.getChildren().add(webContainer);
 
 		LineChart<String, Number> chart = createChart();
 		chart.setLayoutX(20);
@@ -207,7 +207,7 @@ public class StockChart extends Application {
 			.textFill(Color.WHITE)
 			.text(feed.getTitle())
 			.translateY(3)
-			.tooltip(new Tooltip("Blablubb Tooltip"))
+			.tooltip(new Tooltip(feed.getUrl()))
 			.build();
 			
 			
