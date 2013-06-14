@@ -90,6 +90,7 @@ public class AppModel {
 		return nameList;
 	}
 
+	//Bitte als TestDaten drin lassen
 	private void initTestData() {
 
 		//Test-DatenSerie 1

@@ -2,24 +2,21 @@ package de.fhb.trendsys.lsc.gui;
 
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
-import javafx.scene.Node;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 
+//TODO Refractoring to NewsContentPane
 public class Browser extends Region {
 
 	private double myHeight = 300;
 	private double myWidth = 300;
 
 	final WebView browser = new WebView();
-	final WebEngine webEngine = browser.getEngine();
+	public final WebEngine webEngine = browser.getEngine();
 
 	public Browser() {
-//		webEngine.load("http://www.oracle.com/products/index.html");
-		webEngine.load("http://www.computerbase.de");
+		webEngine.loadContent(getHtml("<h1>News-Content-Pane</h1>"));
 		getChildren().add(browser);
 	}
 
@@ -42,13 +39,6 @@ public class Browser extends Region {
 		layoutInArea(browser, 0, 0, getWidth(), getHeight(), 0, HPos.CENTER,
 				VPos.CENTER);
 	}
-	
-//    @SuppressWarnings("unused")
-//	private Node createSpacer() {
-//        Region spacer = new Region();
-//        HBox.setHgrow(spacer, Priority.ALWAYS);
-//        return spacer;
-//    }
 
 	@Override
 	protected double computePrefWidth(double height) {
@@ -64,8 +54,14 @@ public class Browser extends Region {
 		myHeight = height;
 		myWidth = width;
 	}
-	
-	public void loadanotherUrl(String url){
+
+	public void loadanotherUrl(String url) {
 		browser.getEngine().load(url);
 	}
+	
+	private String getHtml(String content) {
+		return "<html><body>" + "<div id=\"mydiv\">" + content + "</div>"
+				+ "</body></html>";
+	}
+	
 }

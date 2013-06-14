@@ -51,8 +51,6 @@ public class StockChart extends Application {
 	private CategoryAxis xAxis;
 	private NumberAxis yAxis;
 
-	public static final String DEFAULT_URL = "http://www.oracle.com/us/index.html";
-
 	private LineChart<String, Number> lineChart;
 	private TabPane tabPane;
 	private Tab chartTab;
@@ -144,13 +142,11 @@ public class StockChart extends Application {
 		System.out.println("Refreshing...");
 		logic.refresh(1);
 		System.out.println("Refresh finished.");
-		
-		webContainer.getWebEngine().load("http://www.oracle.com/us/support/index.html");
 	}
 
 	protected ListView<String> createListView() {
 
-		//TODO ANbindung ans Model
+		//TODO Anbindung ans Model
 		
 		final ListView<String> listView = new ListView<String>();
 		listView.setItems(FXCollections.observableArrayList(
@@ -191,11 +187,6 @@ public class StockChart extends Application {
 		tickerRect.widthProperty().bind(scene.widthProperty().subtract(16));
 		clipRegion.widthProperty().bind(scene.widthProperty().subtract(16));
 		tickerArea.getChildren().add(tickerRect);
-
-		// add text
-//		Text news = TextBuilder.create().text(this.model.getActualNewsFeeds())
-//				.translateY(18).fill(Color.WHITE).build();
-//		tickerArea.getChildren().add(news);
 		
 		//experimental Hyperlink	
 		List<Node> hyperlinks= new ArrayList<Node>();
@@ -236,26 +227,7 @@ public class StockChart extends Application {
 		tickerFlow.setPrefWrapLength(2000);
 		tickerStripe.getChildren().add(tickerFlow);
 		tickerFlow.getChildren().addAll(hyperlinks);
-		
-//        hpl.setOnAction(new EventHandler<ActionEvent>() {
-//            @Override
-//            public void handle(ActionEvent e) {
-//            	System.out.println("This link is clicked");
-////            	tabPane.getSelectionModel().select(webTab);
-////            	webContainer.loadanotherUrl("http://www.finanzen.net/");
-//            	webContainer.webEngine.load("http://www.oracle.com/us/support/index.html");
-////            	webContainer.getWebEngine().load("http://www.oracle.com/us/support/index.html");
-////            	System.out.println(webContainer.getWebEngine().getLoadWorker().isRunning());
-////            	webContainer.getWebEngine().reload();
-////            	webContainer.getWebView().getEngine().load("http://www.golem.de");
-////            	webContainer.getWebView().layout()
-////            	webContainer.layoutChildren();
-//            }
-//        });
-		
         tickerArea.getChildren().add(tickerStripe);
-		
-		
 
 		final TranslateTransition tickerAnimation = TranslateTransitionBuilder
 				.create().node(tickerStripe)
@@ -266,7 +238,6 @@ public class StockChart extends Application {
 				.interpolator(Interpolator.LINEAR).cycleCount(1).build();
 
 		tickerAnimation.setOnFinished(new EventHandler<ActionEvent>() {
-
 			@Override
 			public void handle(ActionEvent arg0) {
 				tickerAnimation.stop();
