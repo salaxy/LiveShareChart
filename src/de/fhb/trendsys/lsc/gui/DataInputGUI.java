@@ -13,6 +13,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.stage.Stage;
 import de.fhb.trendsys.lsc.db.control.BusinessLogic;
 import de.fhb.trendsys.lsc.model.AppModel;
+import de.fhb.trendsys.lsc.model.NewAdvancedAndFancyAppModel;
 
 /**
  * Mit dieser Klasse wird die JavaFX-Applikation gestartet, Sie beinhaltet
@@ -23,7 +24,7 @@ import de.fhb.trendsys.lsc.model.AppModel;
 public class DataInputGUI extends Application {
 
 	private BusinessLogic logic;
-	private AppModel model;
+	private NewAdvancedAndFancyAppModel model;
 
 	@Override
 	public void start(Stage stage) throws Exception {
@@ -33,7 +34,7 @@ public class DataInputGUI extends Application {
 
 	private void init(Stage stage) {
 
-		model = new AppModel();
+		model = new NewAdvancedAndFancyAppModel(this);
 		logic = new BusinessLogic(model);
 
 		Group root = new Group();

@@ -86,7 +86,7 @@ public class ChartVO {
 	public void setNewsFeeds(ArrayList<NewsVO> newsFeeds) {
 		this.newsFeeds = newsFeeds;
 	}
-	
+
 	/**
 	 * Gibt die Änderung des Aktienskurs seit Mitternacht in Prozent aus.
 	 * Positive Zahlen bedeuten, der Kurs ist gestiegen und vice versa.
