@@ -36,6 +36,7 @@ import javafx.util.Duration;
 import de.fhb.trendsys.lsc.db.control.BusinessLogic;
 import de.fhb.trendsys.lsc.model.AppModel;
 import de.fhb.trendsys.lsc.model.FeedVO;
+import de.fhb.trendsys.lsc.model.NewsVO;
 
 /**
  * Mit dieser Klasse wird die JavaFX-Applikation gestartet, Sie beinhaltet
@@ -132,7 +133,7 @@ public class StockChart extends Application {
 			@Override
 			public void handle(ActionEvent e) {
 				button.setText("abgeschickt");
-				logic.refresh(1);
+				logic.refresh();
 			}
 
 		});
@@ -274,9 +275,9 @@ public class StockChart extends Application {
 				if (model.changeActualDataSeries(name)) {
 					// aktualisiere Chart
 					lineChart.setTitle(name);
-					lineChart.setUserData(model.getActualDataSeries());
+					lineChart.setUserData(model.getDataSeries());
 					lineChart.getData().clear();
-					lineChart.getData().add(model.getActualDataSeries());
+					lineChart.getData().add(model.getDataSeries());
 				}
 			}
 
