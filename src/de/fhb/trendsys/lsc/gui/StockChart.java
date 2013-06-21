@@ -35,7 +35,6 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import de.fhb.trendsys.lsc.db.control.BusinessLogic;
 import de.fhb.trendsys.lsc.model.AppModel;
-import de.fhb.trendsys.lsc.model.FeedVO;
 import de.fhb.trendsys.lsc.model.NewsVO;
 
 /**
@@ -134,13 +133,8 @@ public class StockChart extends Application {
 		button.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-<<<<<<< HEAD
 				button.setText("BÄMMMMMMMMM!!!!");
 				logic.refresh(1);
-=======
-				button.setText("abgeschickt");
-				logic.refresh();
->>>>>>> 31fb759800ddb6b830e3aa77f80384bf2904eb50
 			}
 
 		});
@@ -198,7 +192,7 @@ public class StockChart extends Application {
 		List<Node> hyperlinks= new ArrayList<Node>();
 		
 		//erzeuge Hyperlinks mit Listener und fuege sie der Liste hinzu
-		for(final FeedVO feed: this.model.getActualNewsFeeds()){
+		for(final NewsVO feed: this.model.getActualNewsFeeds()){
 			
 			Hyperlink actualLink = HyperlinkBuilder.create()
 			.textFill(Color.WHITE)

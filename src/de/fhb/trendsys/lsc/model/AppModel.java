@@ -6,6 +6,8 @@ import java.util.List;
 import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Series;
 
+import java.util.Date;
+
 /**
  * Das Model beinhaltet immer die aktuellen Chart-Daten.
  * 
@@ -21,7 +23,7 @@ public class AppModel {
 	
 	//TODO FRank wir brauchen heir Datenpaare, da hgaben wir doch schon nen Datenformat oder
 	// der Titel + Link beinhaltet
-	private List<FeedVO> newsFeeds = new ArrayList<FeedVO>();	
+	private List<NewsVO> newsFeeds = new ArrayList<NewsVO>();	
 	private String openedNewsURL = "http://www.finanzen.net/nachricht/aktien/China-und-Costa-Rica-unterzeichnen-Wirtschaftsabkommen-2469118";
 	
 	public AppModel() {
@@ -61,7 +63,7 @@ public class AppModel {
 		this.actualStock = actualStock;
 	}
 
-	public List<FeedVO> getActualNewsFeeds() {
+	public List<NewsVO> getActualNewsFeeds() {
 		return newsFeeds;
 	}
 
@@ -122,28 +124,14 @@ public class AppModel {
 		monthValueSeries.getData().add(new XYChart.Data("Sep", 43));
 		monthValueSeries.getData().add(new XYChart.Data("Oct", 17));
 		monthValueSeries.getData().add(new XYChart.Data("Nov", 29));
-		monthValueSeries.getData().add(new XYChart.Data("Dec", 25));
-        
+		monthValueSeries.getData().add(new XYChart.Data("Dec", 25)); 
 		
-		//Test News-Ticker Daten
-//        this.actualNewsFeeds = "Java FX 2.0 News "  + " ++++ "
-//        +" tomorrow 85 °F and sunny :)" + " ++++ "
-//		+  "DAX	8.241	-1,3% " + " ++++ "
-//		+ " Dow	15.116	-1,4% " + " ++++ "
-//		+ " Euro	1,3021	0,2%" + " ++++ "
-//		+ " ESt50	2.738	-1,1% " + " ++++ "
-//		+ " Nas	3.456	-1,0% " + " ++++ "
-//		+ " Öl	100,1	0,0%"+ " ++++ " 
-//		+ "TDax	949,7	-1,6%  " + " ++++ "
-//		+ " Nikkei	13.262	-3,7%  	" + " ++++ "
-//		+ " Gold	1.399	0,8%";
-		
-		this.newsFeeds= new ArrayList<FeedVO>();
-		newsFeeds.add(new FeedVO("Flying away, amaizing machines!","http://www.tagesschau.de/inland/eurohawk152.html"));
-		newsFeeds.add(new FeedVO("Water, water annnd water again!","http://www.tagesschau.de/inland/hochwasser1142.html"));
-		newsFeeds.add(new FeedVO("Dictator at work!","http://www.tagesschau.de/ausland/eu-erdogan100.html"));
-		newsFeeds.add(new FeedVO("Check thisss out!","http://www.tagesschau.de/inland/geheimdienste110.html"));
-		newsFeeds.add(new FeedVO("Whats going on in Berlin, master of masters is coming!","http://www.rbb-online.de/nachrichten/politik/2013_06/obama_besuch_sorgt_fuer_ausnahmezustand.html"));
+		this.newsFeeds= new ArrayList<NewsVO>();
+		newsFeeds.add(new NewsVO("Flying away, amaizing machines!","description","http://www.tagesschau.de/inland/eurohawk152.html", new Date(System.currentTimeMillis())));
+		newsFeeds.add(new NewsVO("Water, water annnd water again!","description","http://www.tagesschau.de/inland/hochwasser1142.html", new Date(System.currentTimeMillis())));
+		newsFeeds.add(new NewsVO("Dictator at work!","description","http://www.tagesschau.de/ausland/eu-erdogan100.html", new Date(System.currentTimeMillis())));
+		newsFeeds.add(new NewsVO("Check thisss out!","description","http://www.tagesschau.de/inland/geheimdienste110.html", new Date(System.currentTimeMillis())));
+		newsFeeds.add(new NewsVO("Whats going on in Berlin, master of masters is coming!","discription","http://www.rbb-online.de/nachrichten/politik/2013_06/obama_besuch_sorgt_fuer_ausnahmezustand.html", new Date(System.currentTimeMillis())));
 		
 	}
 	
