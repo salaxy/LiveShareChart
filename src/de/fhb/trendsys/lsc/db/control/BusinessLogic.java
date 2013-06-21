@@ -45,4 +45,9 @@ public class BusinessLogic {
 		updateWorker.setPriorityStock(id);
 		this.refresh();
 	}
+	
+	public void shutdown() {
+		Worker updateWorker = Worker.getInstance(model);
+		updateWorker.interrupt();
+	}
 }
