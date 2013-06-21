@@ -138,6 +138,13 @@ public class StockChart extends Application {
 			public void handle(ActionEvent e) {
 				button.setText("BÄMMMMMMMMM!!!!");
 				logic.refresh(1);
+				
+				// aktualisiere Chart
+				model.setSelectedChart(model.returnChartById(1));
+				lineChart.setTitle(model.getSelectedChart().getName());
+				lineChart.setUserData(model.getSelectedChart().getChart());
+				lineChart.getData().clear();
+				lineChart.getData().add(model.getSelectedChart().getChart());
 			}
 
 		});
@@ -146,26 +153,27 @@ public class StockChart extends Application {
 		logic.refresh();
 		this.refresh();
 		System.out.println("Refresh finished.");
+		
 	}
 	
 	
 	protected void refresh(){
 		
 		//Choicebox refesh
-		this.choiceBox.getItems().clear();
+		/*this.choiceBox.getItems().clear();
 		
-		for (String actual : this.model.getStockNames()) {
+		for (String actual : this.model.getChartNamesList()) {
 			this.choiceBox.getItems().add(actual);
-		}
+		}*/
 		
 		//TODO chart refresh
 		
 		String selectedStock= choiceBox.getSelectionModel().getSelectedItem();
 		if(selectedStock!=null){
 			lineChart.setTitle(selectedStock);
-			lineChart.setUserData(model.getDataSeries());
+			lineChart.setUserData(model.getSelectedChart());
 			lineChart.getData().clear();
-			lineChart.getData().add(model.getDataSeries());
+			lineChart.getData().add(model.getSelectedChart().getChart());
 		}
 		
 		
@@ -175,7 +183,7 @@ public class StockChart extends Application {
 		//TODO listView refresh
 		
 		listView.getItems().clear();
-		for(final NewsVO feed: this.model.getActualNewsFeeds()){
+		/*for(final NewsVO feed: this.model.getSelectedChart().getNewsFeeds()){
 			
 			Hyperlink actualLink = HyperlinkBuilder.create()
 			.textFill(Color.WHITE)
@@ -189,7 +197,7 @@ public class StockChart extends Application {
 			
 			
 //			listView.getItems().add(actualLink);
-		}
+		}*/
 
 	}
 
@@ -241,7 +249,6 @@ public class StockChart extends Application {
 		List<Node> hyperlinks= new ArrayList<Node>();
 		
 		//erzeuge Hyperlinks mit Listener und fuege sie der Liste hinzu
-<<<<<<< HEAD
 		if (this.model.getSelectedChart() != null) {
 			for(final NewsVO feed: this.model.getSelectedChart().getNewsFeeds()){
 				
@@ -270,37 +277,6 @@ public class StockChart extends Application {
 						.fill(Color.WHITE).build());
 				
 			}
-=======
-		for(final NewsVO feed: this.model.getActualNewsFeeds()){
-			
-			Hyperlink actualLink = HyperlinkBuilder.create()
-			.textFill(Color.WHITE)
-			.text(feed.getTitle())
-			.translateY(3)
-			.tooltip(new Tooltip(feed.getUrl()))
-			.build();
-			
-			
-			actualLink.setOnAction(new EventHandler<ActionEvent>() {
-	            @Override
-	            public void handle(ActionEvent e) {
-	            	System.out.println("This link is clicked: " + feed.getUrl());
-	            	tabPane.getSelectionModel().select(webTab);
-	            	webContainer.webEngine.load(feed.getUrl());
-	            }
-	        });
-			
-			hyperlinks.add(actualLink);
-			hyperlinks.add(TextBuilder
-					.create()
-					.text("  +++++  ")
-					.translateY(3)
-					.fill(Color.WHITE).build());
-			
-			
-			//TODO adding change of stock today as red or green percent
-			
->>>>>>> 18a9c1a6be062e16cdde7f013406e990a49e8c6b
 		}
 		
 		
@@ -341,10 +317,7 @@ public class StockChart extends Application {
 	protected ChoiceBox<String> createChoiceBox() {
 
 		choiceBox = new ChoiceBox<String>();
-
-		for (String actual : this.model.getChartNames()) {
-			choiceBox.getItems().add(actual);
-		}
+		choiceBox.setItems(this.model.getChartNamesList());
 
 		choiceBox.getSelectionModel().selectFirst();
 		choiceBox.valueProperty().addListener(new ChangeListener<String>() {
@@ -386,13 +359,18 @@ public class StockChart extends Application {
 		xAxis.setLabel("Zeit");
 		// xAxis.setForceZeroInRange(false);
 		yAxis.setLabel("Preis");
-		yAxis.setTickLabelFormatter(new NumberAxis.DefaultFormatter(yAxis, "$",
-				null));
+		yAxis.setTickLabelFormatter(new NumberAxis.DefaultFormatter(yAxis, "$", null));
 
 		// Daten mit linechart verknuepfen - Databinding
 //		lineChart.getData().add(model.getDataSeries());
 
 		return lineChart;
+	}
+	
+	@Override
+	public void stop() throws Exception {
+		logic.shutdown();
+		super.stop();
 	}
 
 	public static void main(String[] args) {

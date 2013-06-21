@@ -2,6 +2,8 @@ package de.fhb.trendsys.lsc.model;
 
 import java.util.ArrayList;
 
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public class NewAdvancedAndFancyAppModel {
@@ -11,14 +13,28 @@ public class NewAdvancedAndFancyAppModel {
 	
 	public NewAdvancedAndFancyAppModel() {
 		chartList = new ArrayList<ChartVO>();
+		chartNamesList = FXCollections.observableArrayList();
 	}
 	
 	/**
 	 * @return Liste aller Aktiendaten
 	 */
-	public ArrayList<ChartVO> getChartList() {
+	private ArrayList<ChartVO> getChartList() {
 		return chartList;
 	}
+	
+	public void addToChartList(final ChartVO chart) {
+		this.chartList.add(chart);
+		Platform.runLater(new Runnable() {
+										  @Override
+										  public void run() {
+											  chartNamesList.add(chart.getName());
+											  System.out.println("Run, Run, Run!");
+										  }
+										 });
+		
+	}
+	
 	/**
 	 * @param Liste aller Aktiendaten
 	 */
@@ -90,13 +106,17 @@ public class NewAdvancedAndFancyAppModel {
 		return null;
 	}
 	
-	public ArrayList<String> getChartNames() {
-		ArrayList<String> returnList = new ArrayList<String>();
-		
-		for (ChartVO chart : chartList) {
-			returnList.add(chart.getName());
-		}
-		
-		return returnList;
+	/**
+	 * @return Namen aller Aktien
+	 */
+	public ObservableList<String> getChartNamesList() {
+		return chartNamesList;
+	}
+
+	/**
+	 * @param Namen aller Aktien
+	 */
+	public void setChartNamesList(ObservableList<String> chartNamesList) {
+		this.chartNamesList = chartNamesList;
 	}
 }

@@ -76,7 +76,6 @@ public class Worker extends Thread {
 				}
 			}
 		}
-		
 	}
 	
 	/**
@@ -142,6 +141,7 @@ public class Worker extends Thread {
 				String newsUrl = null;
 				
 				for (Entry<String, AttributeValue> item : stockSet) {
+					System.out.println("Entry: " + item);
 					String type = item.getKey();
 					
 					if (type.equals("id")) id = Integer.parseInt(item.getValue().getN());
@@ -154,12 +154,16 @@ public class Worker extends Thread {
 				
 				if (id > 0 && !timeStamp.isEmpty()) {
 					ChartVO chart = model.returnChartById(id);
-					if (chart != null)
+					System.out.println("chart id:" + id);
+					if (chart != null) {
 						chart.getChart().getData().add(new XYChart.Data<String, Number>(timeStamp, stockValue));
+						System.out.println("timestamp: " + timeStamp + "  stock value: " + stockValue);
+					}
 					else {
 						chart = new ChartVO(id, "no name");
 						chart.getChart().getData().add(new XYChart.Data<String, Number>(timeStamp, stockValue));
-						model.getChartList().add(chart);
+						model.addToChartList(chart);
+						System.out.println("new chart item: " + chart.getChart());
 					}
 				}
 				
@@ -167,6 +171,7 @@ public class Worker extends Thread {
 					NewsVO news = new NewsVO(newsTitle, newsDescription, newsUrl, new Date(Long.parseLong(timeStamp)));
 					ChartVO chart = model.returnChartById(id);
 					chart.getNewsFeeds().add(news);
+					System.out.println("new news item: " + news);
 				}
 			}
 		}
