@@ -15,6 +15,7 @@ import java.util.Date;
  * @author Andy Klay <klay@fh-brandenburg.de>
  * @author Frank Mertens
  */
+@Deprecated
 public class AppModel {
 
 	private Series<String, Number> currentDataSeries;	
