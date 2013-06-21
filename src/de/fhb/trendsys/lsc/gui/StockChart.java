@@ -59,6 +59,9 @@ public class StockChart extends Application {
 	private Group chartTabGroup;
 	private Group webTabGroup;
 	private Browser webContainer;
+	private ChoiceBox<String> choiceBox;
+//	private FlowPane listView;
+	private ListView<String> listView;
 
 	@Override
 	public void start(Stage stage) throws Exception {
@@ -139,16 +142,62 @@ public class StockChart extends Application {
 
 		});
 
-		System.out.println("Refreshing...");
-		logic.refresh(1);
+		System.out.println("Refreshing GUI...");		
+		logic.refresh();
+		this.refresh();
 		System.out.println("Refresh finished.");
+	}
+	
+	
+	protected void refresh(){
+		
+		//Choicebox refesh
+		this.choiceBox.getItems().clear();
+		
+		for (String actual : this.model.getStockNames()) {
+			this.choiceBox.getItems().add(actual);
+		}
+		
+		//TODO chart refresh
+		
+		String selectedStock= choiceBox.getSelectionModel().getSelectedItem();
+		if(selectedStock!=null){
+			lineChart.setTitle(selectedStock);
+			lineChart.setUserData(model.getDataSeries());
+			lineChart.getData().clear();
+			lineChart.getData().add(model.getDataSeries());
+		}
+		
+		
+		//TODO ticker
+		
+		
+		//TODO listView refresh
+		
+		listView.getItems().clear();
+		for(final NewsVO feed: this.model.getActualNewsFeeds()){
+			
+			Hyperlink actualLink = HyperlinkBuilder.create()
+			.textFill(Color.WHITE)
+			.text(feed.getTitle())
+			.translateY(3)
+			.tooltip(new Tooltip(feed.getUrl()))
+			.build();
+			
+			
+//			listView.getItems().
+			
+			
+//			listView.getItems().add(actualLink);
+		}
+
 	}
 
 	protected ListView<String> createListView() {
 
 		//TODO Anbindung ans Model
 		
-		final ListView<String> listView = new ListView<String>();
+		listView = new ListView<String>();
 		listView.setItems(FXCollections.observableArrayList(
 
 		"Row 1", "Row 2", "Long Row 3", "Row 4", "Row 5", "Row 6", "Row 7",
@@ -192,6 +241,7 @@ public class StockChart extends Application {
 		List<Node> hyperlinks= new ArrayList<Node>();
 		
 		//erzeuge Hyperlinks mit Listener und fuege sie der Liste hinzu
+<<<<<<< HEAD
 		if (this.model.getSelectedChart() != null) {
 			for(final NewsVO feed: this.model.getSelectedChart().getNewsFeeds()){
 				
@@ -220,7 +270,39 @@ public class StockChart extends Application {
 						.fill(Color.WHITE).build());
 				
 			}
+=======
+		for(final NewsVO feed: this.model.getActualNewsFeeds()){
+			
+			Hyperlink actualLink = HyperlinkBuilder.create()
+			.textFill(Color.WHITE)
+			.text(feed.getTitle())
+			.translateY(3)
+			.tooltip(new Tooltip(feed.getUrl()))
+			.build();
+			
+			
+			actualLink.setOnAction(new EventHandler<ActionEvent>() {
+	            @Override
+	            public void handle(ActionEvent e) {
+	            	System.out.println("This link is clicked: " + feed.getUrl());
+	            	tabPane.getSelectionModel().select(webTab);
+	            	webContainer.webEngine.load(feed.getUrl());
+	            }
+	        });
+			
+			hyperlinks.add(actualLink);
+			hyperlinks.add(TextBuilder
+					.create()
+					.text("  +++++  ")
+					.translateY(3)
+					.fill(Color.WHITE).build());
+			
+			
+			//TODO adding change of stock today as red or green percent
+			
+>>>>>>> 18a9c1a6be062e16cdde7f013406e990a49e8c6b
 		}
+		
 		
 		Group tickerStripe= new Group();
 		tickerStripe.setLayoutX(0);
@@ -258,7 +340,7 @@ public class StockChart extends Application {
 
 	protected ChoiceBox<String> createChoiceBox() {
 
-		ChoiceBox<String> choiceBox = new ChoiceBox<String>();
+		choiceBox = new ChoiceBox<String>();
 
 		for (String actual : this.model.getChartNames()) {
 			choiceBox.getItems().add(actual);
@@ -308,7 +390,7 @@ public class StockChart extends Application {
 				null));
 
 		// Daten mit linechart verknuepfen - Databinding
-		// lineChart.getData().add(model.getActualDataSeries());
+//		lineChart.getData().add(model.getDataSeries());
 
 		return lineChart;
 	}

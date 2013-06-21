@@ -51,8 +51,6 @@ public class DataInputGUI extends Application {
         final Label nameLabel = new Label("name");
         final Label kursLabel = new Label("kurs");
 		 
-		
-		
         final TextField rss = new TextField("rss");
         final TextField name = new TextField("name");
         final TextField kurs = new TextField("kurs");
@@ -64,7 +62,7 @@ public class DataInputGUI extends Application {
         flowPane.getChildren().addAll(nameLabel,name, rssLabel,rss,kursLabel,kurs,ok, grabber);
         root.getChildren().add(flowPane);
         
-        
+     
         ok.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
                 ok.setText("abgeschickt");
