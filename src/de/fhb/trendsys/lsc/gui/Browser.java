@@ -13,7 +13,7 @@ public class Browser extends Region {
 	private double myWidth = 300;
 
 	final WebView browser = new WebView();
-	public final WebEngine webEngine = browser.getEngine();
+	final WebEngine webEngine = browser.getEngine();
 
 	public Browser() {
 		webEngine.loadContent(getHtml("<h1>News-Content-Pane</h1>"));
