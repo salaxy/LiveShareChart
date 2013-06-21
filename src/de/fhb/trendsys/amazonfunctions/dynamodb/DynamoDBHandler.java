@@ -110,15 +110,14 @@ public class DynamoDBHandler {
 		keyConditions.put("id", primaryKeyCondition);
 		
 		Condition rangeCondition = new Condition()
-									   .withComparisonOperator(ComparisonOperator.GT)
+									   .withComparisonOperator(ComparisonOperator.GE)
 									   .withAttributeValueList(new AttributeValue()
 									   							   .withS(Long.toString(timestamp)));
 		keyConditions.put("timestamp", rangeCondition);
 		
 		QueryRequest request = new QueryRequest()
 								   .withTableName(selectedTable)
-								   .withKeyConditions(keyConditions)
-								   .withAttributesToGet("timestamp", "stock");
+								   .withKeyConditions(keyConditions);
 		
 		QueryResult result = ddbClient.query(request);
 		
