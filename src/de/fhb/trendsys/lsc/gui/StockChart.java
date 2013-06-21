@@ -59,6 +59,9 @@ public class StockChart extends Application {
 	private Group chartTabGroup;
 	private Group webTabGroup;
 	private Browser webContainer;
+	private ChoiceBox<String> choiceBox;
+//	private FlowPane listView;
+	private ListView<String> listView;
 
 	@Override
 	public void start(Stage stage) throws Exception {
@@ -139,16 +142,62 @@ public class StockChart extends Application {
 
 		});
 
-		System.out.println("Refreshing...");
-		logic.refresh(1);
+		System.out.println("Refreshing GUI...");		
+		logic.refresh();
+		this.refresh();
 		System.out.println("Refresh finished.");
+	}
+	
+	
+	protected void refresh(){
+		
+		//Choicebox refesh
+		this.choiceBox.getItems().clear();
+		
+		for (String actual : this.model.getStockNames()) {
+			this.choiceBox.getItems().add(actual);
+		}
+		
+		//TODO chart refresh
+		
+		String selectedStock= choiceBox.getSelectionModel().getSelectedItem();
+		if(selectedStock!=null){
+			lineChart.setTitle(selectedStock);
+			lineChart.setUserData(model.getDataSeries());
+			lineChart.getData().clear();
+			lineChart.getData().add(model.getDataSeries());
+		}
+		
+		
+		//TODO ticker
+		
+		
+		//TODO listView refresh
+		
+		listView.getItems().clear();
+		for(final NewsVO feed: this.model.getActualNewsFeeds()){
+			
+			Hyperlink actualLink = HyperlinkBuilder.create()
+			.textFill(Color.WHITE)
+			.text(feed.getTitle())
+			.translateY(3)
+			.tooltip(new Tooltip(feed.getUrl()))
+			.build();
+			
+			
+//			listView.getItems().
+			
+			
+//			listView.getItems().add(actualLink);
+		}
+
 	}
 
 	protected ListView<String> createListView() {
 
 		//TODO Anbindung ans Model
 		
-		final ListView<String> listView = new ListView<String>();
+		listView = new ListView<String>();
 		listView.setItems(FXCollections.observableArrayList(
 
 		"Row 1", "Row 2", "Long Row 3", "Row 4", "Row 5", "Row 6", "Row 7",
@@ -218,7 +267,11 @@ public class StockChart extends Application {
 					.translateY(3)
 					.fill(Color.WHITE).build());
 			
+			
+			//TODO adding change of stock today as red or green percent
+			
 		}
+		
 		
 		Group tickerStripe= new Group();
 		tickerStripe.setLayoutX(0);
@@ -256,7 +309,7 @@ public class StockChart extends Application {
 
 	protected ChoiceBox<String> createCoiceBox() {
 
-		ChoiceBox<String> choiceBox = new ChoiceBox<String>();
+		choiceBox = new ChoiceBox<String>();
 
 		for (String actual : this.model.getStockNames()) {
 			choiceBox.getItems().add(actual);
@@ -307,7 +360,7 @@ public class StockChart extends Application {
 				null));
 
 		// Daten mit linechart verknuepfen - Databinding
-		// lineChart.getData().add(model.getActualDataSeries());
+//		lineChart.getData().add(model.getDataSeries());
 
 		return lineChart;
 	}
