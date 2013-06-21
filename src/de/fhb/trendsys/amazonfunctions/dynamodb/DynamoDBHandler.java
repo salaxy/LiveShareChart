@@ -86,11 +86,21 @@ public class DynamoDBHandler {
 	}
 	
 	/**
-	 * Fragt alle Tupel ab, die dieselbe ID haben und deren Erstellungsdatum heute ist.
-	 * @param id Primärschlüssel des Tupels
+	 * Fragt alle Tupel ab, die dieselbe ID haben und deren Erstellungsdatum maximal 24h her ist.
+	 * @param id Primärschlüssel der Tupel
 	 * @return Liste aller passenden Tupel
 	 */
 	public List<Map<String, AttributeValue>> getAllItems(int id) {
+		return getAllItems(id, 86400000L);
+	}
+	
+	/**
+	 * Fragt alle Tupel ab, die dieselbe ID haben und deren Erstelldatum nicht vor dem angegeben Zeitstempel liegen.
+	 * @param id Primärschlüssel der Tupel
+	 * @param timestamp Ältester Zeitpunkt eines Tupels 
+	 * @return Liste aller passenden Tupel
+	 */
+	public List<Map<String, AttributeValue>> getAllItems(int id, long timestamp) {
 		Map<String, Condition> keyConditions = new HashMap<String, Condition>();
 		
 		Condition primaryKeyCondition = new Condition()
@@ -99,11 +109,10 @@ public class DynamoDBHandler {
 									 							 .withN(Integer.toString(id)));
 		keyConditions.put("id", primaryKeyCondition);
 		
-		long sinceYesterday = System.currentTimeMillis() - (System.currentTimeMillis() % 86400000L);
 		Condition rangeCondition = new Condition()
 									   .withComparisonOperator(ComparisonOperator.GT)
 									   .withAttributeValueList(new AttributeValue()
-									   							   .withS(Long.toString(sinceYesterday)));
+									   							   .withS(Long.toString(timestamp)));
 		keyConditions.put("timestamp", rangeCondition);
 		
 		QueryRequest request = new QueryRequest()

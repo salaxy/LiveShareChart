@@ -11,26 +11,25 @@ import javafx.scene.chart.XYChart.Series;
  * 
  * 
  * @author Andy Klay <klay@fh-brandenburg.de>
+ * @author Frank Mertens
  */
 public class AppModel {
 
-	private Series<String, Number> actualDataSeries;
-	
-	private List<Series<String, Number>> avaiableStockData = new ArrayList<Series<String, Number>>();
-	
+	private Series<String, Number> currentDataSeries;	
+	private List<Series<String, Number>> availableStockData = new ArrayList<Series<String, Number>>();	
 	private String actualStock="AktieXY";
 	
 	//TODO FRank wir brauchen heir Datenpaare, da hgaben wir doch schon nen Datenformat oder
 	// der Titel + Link beinhaltet
-	private List<FeedVO> actualNewsFeeds;
+	private List<FeedVO> newsFeeds = new ArrayList<FeedVO>();	
+	private String openedNewsURL = "http://www.finanzen.net/nachricht/aktien/China-und-Costa-Rica-unterzeichnen-Wirtschaftsabkommen-2469118";
 	
-	private String actualOpenedNewsURL = "http://www.finanzen.net/nachricht/aktien/China-und-Costa-Rica-unterzeichnen-Wirtschaftsabkommen-2469118";
+	public AppModel() {
+		initTestData();
+	}
 	
-	private String contentTag ="<div class=\"content\">";
-	//TODO evtl. herraus-parsen des inhaltes, wenn moeglich und zeit is
-
-	public XYChart.Series<String, Number> getActualDataSeries() {
-		return actualDataSeries;
+	public XYChart.Series<String, Number> getDataSeries() {
+		return currentDataSeries;
 	}
 	
 	/**
@@ -44,9 +43,9 @@ public class AppModel {
 		
 		boolean found=false;
 
-		for( Series<String, Number> dataSeries :avaiableStockData ){
+		for( Series<String, Number> dataSeries : availableStockData ){
 			if(dataSeries.getName().equals(name)){
-				this.actualDataSeries= dataSeries;
+				this.currentDataSeries= dataSeries;
 				found=true;
 			}
 		}
@@ -63,27 +62,23 @@ public class AppModel {
 	}
 
 	public List<FeedVO> getActualNewsFeeds() {
-		return actualNewsFeeds;
+		return newsFeeds;
 	}
 
 	public String getActualOpenedNewsURL() {
-		return actualOpenedNewsURL;
+		return openedNewsURL;
 	}
 
 	public void setActualOpenedNewsURL(String actualOpenedNewsURL) {
-		this.actualOpenedNewsURL = actualOpenedNewsURL;
+		this.openedNewsURL = actualOpenedNewsURL;
 	}
 
-	public AppModel() {
-		super();
-		initTestData();
-	}
 	
 	public List<String> getStockNames(){
 		
 		List<String> nameList = new ArrayList<String>();
 		
-		for(XYChart.Series<String, Number> series : avaiableStockData){
+		for(XYChart.Series<String, Number> series : availableStockData){
 			nameList.add(series.getName());
 		}
 		
@@ -96,7 +91,7 @@ public class AppModel {
 		//Test-DatenSerie 1
 		Series<String, Number> numberSeries = new XYChart.Series<String, Number>();
 		numberSeries.setName("TestAktie-Numbers");
-		this.avaiableStockData.add(numberSeries);
+		this.availableStockData.add(numberSeries);
 		
 		numberSeries.getData().add(new XYChart.Data("1", 22));
 		numberSeries.getData().add(new XYChart.Data("2", 13));
@@ -114,7 +109,7 @@ public class AppModel {
 		//Test-DatenSerie 2
 		Series<String, Number> monthValueSeries = new XYChart.Series<String, Number>();;
 		monthValueSeries.setName("TestAktie-MonthValue");
-		this.avaiableStockData.add(monthValueSeries);
+		this.availableStockData.add(monthValueSeries);
 		
 		monthValueSeries.getData().add(new XYChart.Data("Jan", 23));
 		monthValueSeries.getData().add(new XYChart.Data("Feb", 14));
@@ -143,12 +138,12 @@ public class AppModel {
 //		+ " Nikkei	13.262	-3,7%  	" + " ++++ "
 //		+ " Gold	1.399	0,8%";
 		
-		this.actualNewsFeeds= new ArrayList<FeedVO>();
-		actualNewsFeeds.add(new FeedVO("Flying away, amaizing machines!","http://www.tagesschau.de/inland/eurohawk152.html"));
-		actualNewsFeeds.add(new FeedVO("Water, water annnd water again!","http://www.tagesschau.de/inland/hochwasser1142.html"));
-		actualNewsFeeds.add(new FeedVO("Dictator at work!","http://www.tagesschau.de/ausland/eu-erdogan100.html"));
-		actualNewsFeeds.add(new FeedVO("Check thisss out!","http://www.tagesschau.de/inland/geheimdienste110.html"));
-		actualNewsFeeds.add(new FeedVO("Whats going on in Berlin, master of masters is coming!","http://www.rbb-online.de/nachrichten/politik/2013_06/obama_besuch_sorgt_fuer_ausnahmezustand.html"));
+		this.newsFeeds= new ArrayList<FeedVO>();
+		newsFeeds.add(new FeedVO("Flying away, amaizing machines!","http://www.tagesschau.de/inland/eurohawk152.html"));
+		newsFeeds.add(new FeedVO("Water, water annnd water again!","http://www.tagesschau.de/inland/hochwasser1142.html"));
+		newsFeeds.add(new FeedVO("Dictator at work!","http://www.tagesschau.de/ausland/eu-erdogan100.html"));
+		newsFeeds.add(new FeedVO("Check thisss out!","http://www.tagesschau.de/inland/geheimdienste110.html"));
+		newsFeeds.add(new FeedVO("Whats going on in Berlin, master of masters is coming!","http://www.rbb-online.de/nachrichten/politik/2013_06/obama_besuch_sorgt_fuer_ausnahmezustand.html"));
 		
 	}
 	
