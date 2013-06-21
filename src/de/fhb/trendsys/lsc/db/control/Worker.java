@@ -1,12 +1,11 @@
 package de.fhb.trendsys.lsc.db.control;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
-
-import javax.sql.rowset.spi.SyncResolver;
 
 import javafx.scene.chart.XYChart;
 
@@ -14,7 +13,9 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 
 import de.fhb.trendsys.amazonfunctions.dynamodb.DynamoDBHandler;
-import de.fhb.trendsys.lsc.model.AppModel;
+import de.fhb.trendsys.lsc.model.ChartVO;
+import de.fhb.trendsys.lsc.model.NewAdvancedAndFancyAppModel;
+import de.fhb.trendsys.lsc.model.NewsVO;
 
 /**
  * Die Klasse stellt den Hintergrund-Thread dar, der periodisch
@@ -29,10 +30,9 @@ public class Worker extends Thread {
 	private static final long SLOW_UPDATE_RATE = FAST_UPDATE_DELAY * 10;
 	
 	private DynamoDBHandler ddbClient;
-	private AppModel model;
+	private NewAdvancedAndFancyAppModel model;
 	private Map<Integer, Long> stockUpdateQueue;
 	private int priorityStock = 0;
-	private boolean interrupted = false;
 	
 	/**
 	 * Gibt die Instanz des Thread zurück. Existiert sie nicht,
@@ -40,7 +40,7 @@ public class Worker extends Thread {
 	 * @param model Referenz auf das Appmodel, um dort Daten aktualisieren zu können.
 	 * @return Instanz des Threads
 	 */
-	public static Worker getInstance(AppModel model) {
+	public static Worker getInstance(NewAdvancedAndFancyAppModel model) {
 		if (Worker.instance == null || Worker.instance.isAlive() == false || Worker.interrupted() == true) {
 			Worker.instance = new Worker(model);
 			Worker.instance.start();
@@ -56,23 +56,23 @@ public class Worker extends Thread {
 	 * @param model
 	 * @see Worker#getInstance(AppModel)
 	 */
-	private Worker(AppModel model) {
+	private Worker(NewAdvancedAndFancyAppModel model) {
 		this.model = model;
 		this.stockUpdateQueue = new HashMap<Integer, Long>();
 		this.ddbClient = new DynamoDBHandler(Regions.EU_WEST_1, "stockdata");
 	}
 	
 	public void run() {
-		//this.stockUpdateQueue = this.getStockIds();
+		this.stockUpdateQueue = this.getStockIds();
 		
-		while (!this.interrupted) {
+		while (!this.isInterrupted()) {
 			this.processQueue();
 			
 			synchronized (this) {
 				try {
 					this.wait(Worker.FAST_UPDATE_DELAY);
 				} catch (InterruptedException e) {
-					this.interrupted = true;
+					// Interrupt 
 				}
 			}
 		}
@@ -90,8 +90,6 @@ public class Worker extends Thread {
 	 */
 	private Map<Integer, Long> getStockIds() {
 		Map<Integer, Long> returnMap = new HashMap<Integer, Long>();
-		List<Map<String, AttributeValue>> bla = this.ddbClient.getAllItems(0, 0L);
-		System.out.println(bla);
 		Map<String, AttributeValue> resultMap = (this.ddbClient.getAllItems(0, 0L)).get(0);
 		Set<Entry<String, AttributeValue>> resultSet = resultMap.entrySet();
 		int stockId;
@@ -99,7 +97,7 @@ public class Worker extends Thread {
 		
 		for (Entry<String, AttributeValue> item : resultSet) {
 			if (item.getKey().startsWith("stockid")) {
-				stockId = Integer.getInteger(item.getValue().getN());
+				stockId = Integer.parseInt(item.getValue().getS());
 				lastUpdateTime = System.currentTimeMillis() - 86400000L; // vor einem Tag
 				returnMap.put(stockId, lastUpdateTime);
 			}
@@ -136,18 +134,39 @@ public class Worker extends Thread {
 			for (Map<String, AttributeValue> stockMap : updatedStockDataList) {
 				Set<Entry<String, AttributeValue>>  stockSet = stockMap.entrySet();
 				
+				int id = 0;
 				String timeStamp = null;
-				Double stockValue = 0d;
+				double stockValue = 0d;
+				String newsTitle = null;
+				String newsDescription = null;
+				String newsUrl = null;
 				
 				for (Entry<String, AttributeValue> item : stockSet) {
-					if (timeStamp == null)
-						timeStamp = item.getValue().getS();
-					else
-						stockValue = Double.parseDouble(item.getValue().getS());
+					String type = item.getKey();
+					
+					if (type.equals("id")) id = Integer.parseInt(item.getValue().getN());
+					if (type.equals("timestamp")) timeStamp = item.getValue().getS();
+					if (type.equals("stock")) stockValue = Double.parseDouble(item.getValue().getS());
+					if (type.equals("newstitle")) newsTitle = item.getValue().getS();
+					if (type.equals("newsdescription")) newsDescription = item.getValue().getS();
+					if (type.equals("newsurl")) newsUrl = item.getValue().getS();
 				}
 				
-				if(this.model.getDataSeries()!=null) {
-					this.model.getDataSeries().getData().add(new XYChart.Data<String, Number>(timeStamp, stockValue));
+				if (id > 0 && !timeStamp.isEmpty()) {
+					ChartVO chart = model.returnChartById(id);
+					if (chart != null)
+						chart.getChart().getData().add(new XYChart.Data<String, Number>(timeStamp, stockValue));
+					else {
+						chart = new ChartVO(id, "no name");
+						chart.getChart().getData().add(new XYChart.Data<String, Number>(timeStamp, stockValue));
+						model.getChartList().add(chart);
+					}
+				}
+				
+				if (newsTitle != null && newsDescription != null && newsUrl != null) {
+					NewsVO news = new NewsVO(newsTitle, newsDescription, newsUrl, new Date(Long.parseLong(timeStamp)));
+					ChartVO chart = model.returnChartById(id);
+					chart.getNewsFeeds().add(news);
 				}
 			}
 		}

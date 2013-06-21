@@ -1,6 +1,6 @@
 package de.fhb.trendsys.lsc.db.control;
 
-import de.fhb.trendsys.lsc.model.AppModel;
+import de.fhb.trendsys.lsc.model.NewAdvancedAndFancyAppModel;
 
 
 /**
@@ -13,16 +13,15 @@ import de.fhb.trendsys.lsc.model.AppModel;
  */
 public class BusinessLogic {
 
-	private AppModel model;
+	private NewAdvancedAndFancyAppModel model;
 
 	/**
 	 * Erzeugt eine Instanz der Businesslogik.
 	 * Sie startet dabei auch einen {@link Worker}-Thread, der regelm‰ﬂig das Model aktialisiert.
 	 * @param model Model
 	 */
-	public BusinessLogic(AppModel model) {
+	public BusinessLogic(NewAdvancedAndFancyAppModel model) {
 		Worker updateWorker = Worker.getInstance(model);
-		
 		this.model=model;
 	}
 	

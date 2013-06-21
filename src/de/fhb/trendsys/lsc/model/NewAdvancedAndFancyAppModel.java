@@ -2,9 +2,16 @@ package de.fhb.trendsys.lsc.model;
 
 import java.util.ArrayList;
 
+import javafx.collections.ObservableList;
+
 public class NewAdvancedAndFancyAppModel {
 	private ArrayList<ChartVO> chartList;
 	private ChartVO selectedChart;
+	private ObservableList<String> chartNamesList;
+	
+	public NewAdvancedAndFancyAppModel() {
+		chartList = new ArrayList<ChartVO>();
+	}
 	
 	/**
 	 * @return Liste aller Aktiendaten
@@ -81,5 +88,15 @@ public class NewAdvancedAndFancyAppModel {
 		}
 		
 		return null;
+	}
+	
+	public ArrayList<String> getChartNames() {
+		ArrayList<String> returnList = new ArrayList<String>();
+		
+		for (ChartVO chart : chartList) {
+			returnList.add(chart.getName());
+		}
+		
+		return returnList;
 	}
 }

@@ -34,7 +34,7 @@ import javafx.scene.text.TextBuilder;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import de.fhb.trendsys.lsc.db.control.BusinessLogic;
-import de.fhb.trendsys.lsc.model.AppModel;
+import de.fhb.trendsys.lsc.model.NewAdvancedAndFancyAppModel;
 import de.fhb.trendsys.lsc.model.NewsVO;
 
 /**
@@ -47,7 +47,7 @@ import de.fhb.trendsys.lsc.model.NewsVO;
 public class StockChart extends Application {
 
 	private BusinessLogic logic;
-	private AppModel model;
+	private NewAdvancedAndFancyAppModel model;
 
 	private CategoryAxis xAxis;
 	private NumberAxis yAxis;
@@ -90,7 +90,7 @@ public class StockChart extends Application {
 
 	private void init(Stage stage) {
 
-		model = new AppModel();
+		model = new NewAdvancedAndFancyAppModel();
 		logic = new BusinessLogic(model);
 
 		Group root = new Group();
@@ -109,7 +109,7 @@ public class StockChart extends Application {
 		chart.setPrefSize(600, 600);
 		chartTabGroup.getChildren().add(chart);
 
-		ChoiceBox<String> choice = createCoiceBox();
+		ChoiceBox<String> choice = createChoiceBox();
 		choice.setLayoutX(30);
 		choice.setLayoutY(15);
 		chartTabGroup.getChildren().add(choice);
@@ -192,32 +192,34 @@ public class StockChart extends Application {
 		List<Node> hyperlinks= new ArrayList<Node>();
 		
 		//erzeuge Hyperlinks mit Listener und fuege sie der Liste hinzu
-		for(final NewsVO feed: this.model.getActualNewsFeeds()){
-			
-			Hyperlink actualLink = HyperlinkBuilder.create()
-			.textFill(Color.WHITE)
-			.text(feed.getTitle())
-			.translateY(3)
-			.tooltip(new Tooltip(feed.getUrl()))
-			.build();
-			
-			
-			actualLink.setOnAction(new EventHandler<ActionEvent>() {
-	            @Override
-	            public void handle(ActionEvent e) {
-	            	System.out.println("This link is clicked: " + feed.getUrl());
-	            	tabPane.getSelectionModel().select(webTab);
-	            	webContainer.webEngine.load(feed.getUrl());
-	            }
-	        });
-			
-			hyperlinks.add(actualLink);
-			hyperlinks.add(TextBuilder
-					.create()
-					.text("  +++++  ")
-					.translateY(3)
-					.fill(Color.WHITE).build());
-			
+		if (this.model.getSelectedChart() != null) {
+			for(final NewsVO feed: this.model.getSelectedChart().getNewsFeeds()){
+				
+				Hyperlink actualLink = HyperlinkBuilder.create()
+				.textFill(Color.WHITE)
+				.text(feed.getTitle())
+				.translateY(3)
+				.tooltip(new Tooltip(feed.getUrl()))
+				.build();
+				
+				
+				actualLink.setOnAction(new EventHandler<ActionEvent>() {
+		            @Override
+		            public void handle(ActionEvent e) {
+		            	System.out.println("This link is clicked: " + feed.getUrl());
+		            	tabPane.getSelectionModel().select(webTab);
+		            	webContainer.webEngine.load(feed.getUrl());
+		            }
+		        });
+				
+				hyperlinks.add(actualLink);
+				hyperlinks.add(TextBuilder
+						.create()
+						.text("  +++++  ")
+						.translateY(3)
+						.fill(Color.WHITE).build());
+				
+			}
 		}
 		
 		Group tickerStripe= new Group();
@@ -254,11 +256,11 @@ public class StockChart extends Application {
 		return tickerArea;
 	}
 
-	protected ChoiceBox<String> createCoiceBox() {
+	protected ChoiceBox<String> createChoiceBox() {
 
 		ChoiceBox<String> choiceBox = new ChoiceBox<String>();
 
-		for (String actual : this.model.getStockNames()) {
+		for (String actual : this.model.getChartNames()) {
 			choiceBox.getItems().add(actual);
 		}
 
@@ -271,13 +273,12 @@ public class StockChart extends Application {
 
 				System.out.println("ChoiceBox: " + name);
 
-				if (model.changeActualDataSeries(name)) {
-					// aktualisiere Chart
-					lineChart.setTitle(name);
-					lineChart.setUserData(model.getDataSeries());
-					lineChart.getData().clear();
-					lineChart.getData().add(model.getDataSeries());
-				}
+				model.setSelectedChart(model.returnChartByName(name));
+				// aktualisiere Chart
+				lineChart.setTitle(name);
+				lineChart.setUserData(model.getSelectedChart().getChart());
+				lineChart.getData().clear();
+				lineChart.getData().add(model.getSelectedChart().getChart());
 			}
 
 		});
