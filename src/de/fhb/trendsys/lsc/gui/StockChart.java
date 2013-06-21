@@ -35,7 +35,6 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import de.fhb.trendsys.lsc.db.control.BusinessLogic;
 import de.fhb.trendsys.lsc.model.AppModel;
-import de.fhb.trendsys.lsc.model.FeedVO;
 import de.fhb.trendsys.lsc.model.NewsVO;
 
 /**
@@ -44,6 +43,7 @@ import de.fhb.trendsys.lsc.model.NewsVO;
  * 
  * @author Andy Klay <klay@fh-brandenburg.de>
  */
+//TODO Refractoring to StockChartGUI
 public class StockChart extends Application {
 
 	private BusinessLogic logic;
@@ -110,8 +110,8 @@ public class StockChart extends Application {
 		chartTabGroup.getChildren().add(chart);
 
 		ChoiceBox<String> choice = createCoiceBox();
-		choice.setLayoutX(10);
-		choice.setLayoutY(10);
+		choice.setLayoutX(30);
+		choice.setLayoutY(15);
 		chartTabGroup.getChildren().add(choice);
 
 		ListView<String> listView = createListView();
@@ -124,21 +124,20 @@ public class StockChart extends Application {
 		newsTicker.toFront();
 		root.getChildren().add(newsTicker);
 
-		final Button button = new Button("Red");
-		button.setLayoutX(200);
-		button.setLayoutY(10);
+		final Button button = new Button("Do not Push the RED-Button!");
+		button.setStyle("-fx-base: red;");
+		button.setLayoutX(500);
+		button.setLayoutY(15);
 		chartTabGroup.getChildren().add(button);
 
 		button.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				button.setText("abgeschickt");
-				logic.refresh();
+				button.setText("BÄMMMMMMMMM!!!!");
+				logic.refresh(1);
 			}
 
 		});
-
-		// TODO Andy - timeline / animation
 
 		System.out.println("Refreshing...");
 		logic.refresh(1);
@@ -193,7 +192,7 @@ public class StockChart extends Application {
 		List<Node> hyperlinks= new ArrayList<Node>();
 		
 		//erzeuge Hyperlinks mit Listener und fuege sie der Liste hinzu
-		for(final FeedVO feed: this.model.getActualNewsFeeds()){
+		for(final NewsVO feed: this.model.getActualNewsFeeds()){
 			
 			Hyperlink actualLink = HyperlinkBuilder.create()
 			.textFill(Color.WHITE)
