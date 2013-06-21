@@ -2,18 +2,31 @@ package de.fhb.trendsys.lsc.model;
 
 import java.util.ArrayList;
 
+import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyIntegerProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.scene.control.ChoiceBox;
+import javafx.stage.Stage;
 
 public class NewAdvancedAndFancyAppModel {
 	private ArrayList<ChartVO> chartList;
 	private ChartVO selectedChart;
 	private ObservableList<String> chartNamesList;
+	private ListProperty<String> chartNamesListNew;
+	private ChoiceBox<String> choiceBox;
 	
-	public NewAdvancedAndFancyAppModel() {
+	public NewAdvancedAndFancyAppModel(ChoiceBox choiceBox) {
 		chartList = new ArrayList<ChartVO>();
 		chartNamesList = FXCollections.observableArrayList();
+		this.choiceBox = choiceBox;
 	}
 	
 	/**
@@ -23,16 +36,35 @@ public class NewAdvancedAndFancyAppModel {
 		return chartList;
 	}
 	
+	/**
+	 * @return the chartNamesListNew
+	 */
+	public ListProperty<String> getChartNamesListNew() {
+		return chartNamesListNew;
+	}
+
+	/**
+	 * @param chartNamesListNew the chartNamesListNew to set
+	 */
+	public void setChartNamesListNew(ListProperty<String> chartNamesListNew) {
+		this.chartNamesListNew = chartNamesListNew;
+	}
+
 	public void addToChartList(final ChartVO chart) {
 		this.chartList.add(chart);
-		Platform.runLater(new Runnable() {
+		choiceBox.getItems().add(chart.getName());
+		//this.chartNamesList.add(chart.getName());
+		/*Platform.runLater(new Runnable() {
 										  @Override
 										  public void run() {
+											  
+											  System.out.println("chartNameList was: " + chartNamesList);
 											  chartNamesList.add(chart.getName());
 											  System.out.println("Run, Run, Run!");
+											  System.out.println("ChartNameList is now: " + chartNamesList);
 										  }
 										 });
-		
+		*/
 	}
 	
 	/**

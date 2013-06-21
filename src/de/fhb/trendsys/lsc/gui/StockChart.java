@@ -10,6 +10,7 @@ import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Side;
@@ -93,7 +94,11 @@ public class StockChart extends Application {
 
 	private void init(Stage stage) {
 
-		model = new NewAdvancedAndFancyAppModel();
+		ChoiceBox<String> choice = createChoiceBox();
+		choice.setLayoutX(30);
+		choice.setLayoutY(15);
+		
+		model = new NewAdvancedAndFancyAppModel(choice);
 		logic = new BusinessLogic(model);
 
 		Group root = new Group();
@@ -112,9 +117,9 @@ public class StockChart extends Application {
 		chart.setPrefSize(600, 600);
 		chartTabGroup.getChildren().add(chart);
 
-		ChoiceBox<String> choice = createChoiceBox();
-		choice.setLayoutX(30);
-		choice.setLayoutY(15);
+		//ChoiceBox<String> choice = createChoiceBox();
+		//choice.setLayoutX(30);
+		//choice.setLayoutY(15);
 		chartTabGroup.getChildren().add(choice);
 
 		ListView<String> listView = createListView();
@@ -145,6 +150,9 @@ public class StockChart extends Application {
 				lineChart.setUserData(model.getSelectedChart().getChart());
 				lineChart.getData().clear();
 				lineChart.getData().add(model.getSelectedChart().getChart());
+				
+				choiceBox.getItems().add("bla " + System.currentTimeMillis());
+				
 			}
 
 		});
@@ -317,8 +325,11 @@ public class StockChart extends Application {
 	protected ChoiceBox<String> createChoiceBox() {
 
 		choiceBox = new ChoiceBox<String>();
-		choiceBox.setItems(this.model.getChartNamesList());
-
+		ObservableList<String> list = FXCollections.observableArrayList();
+		choiceBox.setItems(list);
+		
+		//choiceBox.setItems(this.model.getChartNamesList());
+		//choiceBox.setUserData(this.model.getChartNamesList());
 		choiceBox.getSelectionModel().selectFirst();
 		choiceBox.valueProperty().addListener(new ChangeListener<String>() {
 

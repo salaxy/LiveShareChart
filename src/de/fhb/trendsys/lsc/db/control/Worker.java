@@ -162,6 +162,7 @@ public class Worker extends Thread {
 					else {
 						chart = new ChartVO(id, "no name");
 						chart.getChart().getData().add(new XYChart.Data<String, Number>(timeStamp, stockValue));
+						System.out.println("Adding chart " + chart.getId());
 						model.addToChartList(chart);
 						System.out.println("new chart item: " + chart.getChart());
 					}

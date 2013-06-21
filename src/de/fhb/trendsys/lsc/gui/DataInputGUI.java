@@ -34,7 +34,7 @@ public class DataInputGUI extends Application {
 
 	private void init(Stage stage) {
 
-		model = new NewAdvancedAndFancyAppModel();
+		model = new NewAdvancedAndFancyAppModel(this);
 		logic = new BusinessLogic(model);
 
 		Group root = new Group();
