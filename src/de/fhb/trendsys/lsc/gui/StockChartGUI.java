@@ -93,7 +93,7 @@ public class StockChartGUI extends Application {
 		testSeries.getData().add(new XYChart.Data(this.millisToHHMM(System.currentTimeMillis()+(9*6000)), 35));
 		testSeries.getData().add(new XYChart.Data(this.millisToHHMM(System.currentTimeMillis()+(10*6000)), 30));
 		testSeries.getData().add(new XYChart.Data(this.millisToHHMM(System.currentTimeMillis()+(11*6000)), 28));
-		testSeries.getData().add(new XYChart.Data(this.millisToHHMM(System.currentTimeMillis()+(12*6000)), 22));
+		testSeries.getData().add(new XYChart.Data(this.millisToHHMM(System.currentTimeMillis()+(12*6000)), 30));
 		
 		
 		testFeeds= new ArrayList<NewsVO>();
@@ -136,12 +136,9 @@ public class StockChartGUI extends Application {
 
 	private void init(Stage stage) {
 
-		ChoiceBox<String> choice = createChoiceBox();
-		choice.setLayoutX(30);
-		choice.setLayoutY(15);
-		
-		model = new NewAdvancedAndFancyAppModel(choice);
-		logic = new BusinessLogic(model);
+		choiceBox = createChoiceBox();
+		choiceBox.setLayoutX(30);
+		choiceBox.setLayoutY(15);
 
 		Group root = new Group();
 		Scene scene = new Scene(root, 950, 650);
@@ -162,7 +159,7 @@ public class StockChartGUI extends Application {
 		//ChoiceBox<String> choice = createChoiceBox();
 		//choice.setLayoutX(30);
 		//choice.setLayoutY(15);
-		chartTabGroup.getChildren().add(choice);
+		chartTabGroup.getChildren().add(choiceBox);
 
 		stockNewsPane = createStockNewsPane();
 		stockNewsPane.setLayoutX(620);
@@ -177,14 +174,19 @@ public class StockChartGUI extends Application {
 		bigRedButton= createBigRedButton();
 		chartTabGroup.getChildren().add(bigRedButton);
 
+		model = new NewAdvancedAndFancyAppModel(choiceBox);
+		logic = new BusinessLogic(model);
+		
+		//hier erst das erste mal zeichnen!!!
 		System.out.println("Refreshing GUI...");		
 		logic.refresh();
 		this.refresh();
 		System.out.println("Refresh finished.");
 		
+		
 	}
 
-	private Button createBigRedButton() {
+	protected Button createBigRedButton() {
 		final Button button;
 		button = new Button("Do not Push the RED-Button!");
 		button.setStyle("-fx-base: red;");
@@ -208,6 +210,11 @@ public class StockChartGUI extends Application {
 				
 				//TODO
 				System.out.println(millisToHHMM(System.currentTimeMillis()));
+				System.out.println(choiceBox.itemsProperty().get().size());
+				
+				for(String act: choiceBox.itemsProperty().get()){
+					System.out.println(act);
+				}
 				
 			}
 
@@ -345,6 +352,7 @@ public class StockChartGUI extends Application {
 		List<Node> hyperlinks= new ArrayList<Node>();
 		
 		//erzeuge Hyperlinks mit Listener und fuege sie der Liste hinzu
+		if (this.model!= null)
 		if (this.model.getSelectedChart() != null) {
 			for(final NewsVO feed: this.model.getSelectedChart().getNewsFeeds()){
 				
@@ -378,13 +386,15 @@ public class StockChartGUI extends Application {
 		
 		// insert Stock values in red or green color
 		//*****************************************************
-		
-		
 		//with testseries
 		
 		double stockDayDiff= testSeries.getData().get(0).getYValue().doubleValue()-testSeries.getData().get(testSeries.getData().size()-1).getYValue().doubleValue();
-		//TODO percentage
+		double percentageDiff= 0d;
 		
+		if(stockDayDiff!=0d){
+			percentageDiff=stockDayDiff/testSeries.getData().get(0).getYValue().doubleValue();	
+		}
+		percentageDiff=-percentageDiff;
 		
 		hyperlinks.add(TextBuilder
 				.create()
@@ -393,39 +403,27 @@ public class StockChartGUI extends Application {
 				.translateY(3)
 				.fill(Color.WHITE).build());
 		
-		
 		if(stockDayDiff>=0d){
-			
 			hyperlinks.add(TextBuilder
 					.create()
-					.text("  "+ testSeries.getName() + " " + stockDayDiff+ "%")
-					.font(Font.font("Verdana", FontWeight.BOLD, 12))
-					.translateY(3)
-					.fill(Color.DARKGREEN).build());
-			
-		}else{
-			
-			hyperlinks.add(TextBuilder
-					.create()
-					.text("  "+ testSeries.getName() + " " + stockDayDiff+ "%")
+					.text("  "+ testSeries.getName() + " " + String.format(" %.2f", percentageDiff) + "%")
 					.font(Font.font("Verdana", FontWeight.BOLD, 12))
 					.translateY(3)
 					.fill(Color.DARKRED).build());
-			
+		}else{
+			hyperlinks.add(TextBuilder
+					.create()
+					.text("  "+ testSeries.getName() + " " + String.format("+ %.2f", percentageDiff) + "%")
+					.font(Font.font("Verdana", FontWeight.BOLD, 12))
+					.translateY(3)
+					.fill(Color.DARKGREEN).build());	
 		}
 
-		
-		
-		
 		hyperlinks.add(TextBuilder
 				.create()
 				.text("  +++++  ")
 				.translateY(3)
 				.fill(Color.WHITE).build());
-	
-		
-		
-		
 		//****************************************************************
 		
 		Group tickerStripe= new Group();
@@ -465,8 +463,10 @@ public class StockChartGUI extends Application {
 	protected ChoiceBox<String> createChoiceBox() {
 
 		choiceBox = new ChoiceBox<String>();
-		ObservableList<String> list = FXCollections.observableArrayList();
-		choiceBox.setItems(list);
+//		ObservableList<String> list = FXCollections.observableArrayList();
+//		choiceBox.setItems(list);
+		
+		
 		
 		//choiceBox.setItems(this.model.getChartNamesList());
 		//choiceBox.setUserData(this.model.getChartNamesList());
