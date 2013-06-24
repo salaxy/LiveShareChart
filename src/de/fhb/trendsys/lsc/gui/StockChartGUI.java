@@ -1,7 +1,9 @@
 package de.fhb.trendsys.lsc.gui;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import javafx.animation.Interpolator;
@@ -66,6 +68,7 @@ public class StockChartGUI extends Application {
 	private NewsContentPane webContainer;
 	private ChoiceBox<String> choiceBox;
 	private TilePane stockNewsPane;
+	private Button bigRedButton;
 
 	@Override
 	public void start(Stage stage) throws Exception {
@@ -135,36 +138,45 @@ public class StockChartGUI extends Application {
 		newsTicker.toFront();
 		root.getChildren().add(newsTicker);
 
-		final Button button = new Button("Do not Push the RED-Button!");
-		button.setStyle("-fx-base: red;");
-		button.setLayoutX(500);
-		button.setLayoutY(15);
-		chartTabGroup.getChildren().add(button);
-
-		button.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				button.setText("BÄMMMMMMMMM!!!!");
-				logic.refresh(1);
-				
-				// aktualisiere Chart
-				model.setSelectedChart(model.returnChartById(1));
-				lineChart.setTitle(model.getSelectedChart().getName());
-				lineChart.setUserData(model.getSelectedChart().getChart());
-				lineChart.getData().clear();
-				lineChart.getData().add(model.getSelectedChart().getChart());
-				
-				choiceBox.getItems().add("bla " + System.currentTimeMillis());
-				
-			}
-
-		});
+		bigRedButton= createBigRedButton();
+		chartTabGroup.getChildren().add(bigRedButton);
 
 		System.out.println("Refreshing GUI...");		
 		logic.refresh();
 		this.refresh();
 		System.out.println("Refresh finished.");
 		
+	}
+
+	private Button createBigRedButton() {
+		final Button button;
+		button = new Button("Do not Push the RED-Button!");
+		button.setStyle("-fx-base: red;");
+		button.setLayoutX(500);
+		button.setLayoutY(15);
+
+		button.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent e) {
+				button.setText("BÄMMMMMMMMM!!!!");
+//				logic.refresh(1);
+//				
+//				// aktualisiere Chart
+//				model.setSelectedChart(model.returnChartById(1));
+//				lineChart.setTitle(model.getSelectedChart().getName());
+//				lineChart.setUserData(model.getSelectedChart().getChart());
+//				lineChart.getData().clear();
+//				lineChart.getData().add(model.getSelectedChart().getChart());
+//				
+//				choiceBox.getItems().add("bla " + System.currentTimeMillis());
+				
+				//TODO
+				System.out.println(millisToHHMM(System.currentTimeMillis()));
+				
+			}
+
+		});
+		return button;
 	}
 	
 	
@@ -268,20 +280,6 @@ public class StockChartGUI extends Application {
 			stockNewsPane.getChildren().add(actualLink);
 			
 		}
-		
-
-		
-		
-		
-//		listView = new ListView<String>();
-//		listView.setItems(FXCollections.observableArrayList(
-//
-//		"Row 1", "Row 2", "Long Row 3", "Row 4", "Row 5", "Row 6", "Row 7",
-//				"Row 8", "Row 9", "Row 10", "Row 11", "Row 12", "Row 13",
-//				"Row 14", "Row 15", "Row 16", "Row 17", "Row 18", "Row 19",
-//				"Row 20"
-//
-//		));
 
 		return 	stockNewsPane;
 	}
@@ -436,6 +434,23 @@ public class StockChartGUI extends Application {
 //		lineChart.getData().add(model.getDataSeries());
 
 		return lineChart;
+	}
+	
+	
+	/**
+	 * wandelt Zeit von millisekunden in einen hh:mm-Formatierten String um
+	 * @param millis
+	 * @return Zeit "hh:mm"
+	 */
+	public String millisToHHMM(long millis){
+		
+		Date d = new Date(millis);
+		Calendar c = new GregorianCalendar();
+		c.setTime(d);
+		int mm = c.get(Calendar.MINUTE);
+		int hh =c.get(Calendar.HOUR_OF_DAY);
+		
+		return String.format("%02d:%02d",hh,mm);
 	}
 	
 	@Override
