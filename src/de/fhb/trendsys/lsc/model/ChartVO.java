@@ -26,6 +26,7 @@ public class ChartVO {
 	public ChartVO(int id, String name) {
 		super();
 		this.setId(id);
+		this.name=name;
 		this.setChart(new Series<String, Number>());
 		this.getChart().setName(this.getName());
 		this.setNewsFeeds(new ArrayList<NewsVO>());
