@@ -25,6 +25,8 @@ import javafx.scene.Scene;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
+import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Hyperlink;
@@ -69,9 +71,43 @@ public class StockChartGUI extends Application {
 	private ChoiceBox<String> choiceBox;
 	private TilePane stockNewsPane;
 	private Button bigRedButton;
+	
+	private Series<String, Number> testSeries;
+	
+	private ArrayList<NewsVO> testFeeds;
+	
+	
+	public void initTestData(){
+		
+		testSeries = new XYChart.Series<String, Number>();
+		testSeries.setName("TestAktie-Numbers");
+		
+		testSeries.getData().add(new XYChart.Data(this.millisToHHMM(System.currentTimeMillis()+(1*6000)), 22));
+		testSeries.getData().add(new XYChart.Data(this.millisToHHMM(System.currentTimeMillis()+(2*6000)), 13));
+		testSeries.getData().add(new XYChart.Data(this.millisToHHMM(System.currentTimeMillis()+(3*6000)), 16));
+		testSeries.getData().add(new XYChart.Data(this.millisToHHMM(System.currentTimeMillis()+(4*6000)), 23));
+		testSeries.getData().add(new XYChart.Data(this.millisToHHMM(System.currentTimeMillis()+(5*6000)), 35));
+		testSeries.getData().add(new XYChart.Data(this.millisToHHMM(System.currentTimeMillis()+(6*6000)), 33));
+		testSeries.getData().add(new XYChart.Data(this.millisToHHMM(System.currentTimeMillis()+(7*6000)), 40));
+		testSeries.getData().add(new XYChart.Data(this.millisToHHMM(System.currentTimeMillis()+(8*6000)), 44));
+		testSeries.getData().add(new XYChart.Data(this.millisToHHMM(System.currentTimeMillis()+(9*6000)), 35));
+		testSeries.getData().add(new XYChart.Data(this.millisToHHMM(System.currentTimeMillis()+(10*6000)), 30));
+		testSeries.getData().add(new XYChart.Data(this.millisToHHMM(System.currentTimeMillis()+(11*6000)), 28));
+		testSeries.getData().add(new XYChart.Data(this.millisToHHMM(System.currentTimeMillis()+(12*6000)), 22));
+		
+		
+		testFeeds= new ArrayList<NewsVO>();
+		testFeeds.add(new NewsVO("Flying away, amaizing machines!","description","http://www.tagesschau.de/inland/eurohawk152.html", new Date(System.currentTimeMillis())));
+		testFeeds.add(new NewsVO("Water, water annnd water again!","description","http://www.tagesschau.de/inland/hochwasser1142.html", new Date(System.currentTimeMillis())));
+		testFeeds.add(new NewsVO("Dictator at work!","description","http://www.tagesschau.de/ausland/eu-erdogan100.html", new Date(System.currentTimeMillis())));
+		testFeeds.add(new NewsVO("Check thisss out!","description","http://www.tagesschau.de/inland/geheimdienste110.html", new Date(System.currentTimeMillis())));
+		testFeeds.add(new NewsVO("Whats going on in Berlin, master of masters is coming!","discription","http://www.rbb-online.de/nachrichten/politik/2013_06/obama_besuch_sorgt_fuer_ausnahmezustand.html", new Date(System.currentTimeMillis())));
+		
+	}
 
 	@Override
 	public void start(Stage stage) throws Exception {
+		initTestData();
 		this.init(stage);
 		stage.show();
 	}
@@ -238,17 +274,11 @@ public class StockChartGUI extends Application {
 		stockNewsPane.setTileAlignment(Pos.CENTER_LEFT);
 		
 		//TestData
-		ArrayList<NewsVO> newsFeeds= new ArrayList<NewsVO>();
-		newsFeeds.add(new NewsVO("Flying away, amaizing machines!","description","http://www.tagesschau.de/inland/eurohawk152.html", new Date(System.currentTimeMillis())));
-		newsFeeds.add(new NewsVO("Water, water annnd water again!","description","http://www.tagesschau.de/inland/hochwasser1142.html", new Date(System.currentTimeMillis())));
-		newsFeeds.add(new NewsVO("Dictator at work!","description","http://www.tagesschau.de/ausland/eu-erdogan100.html", new Date(System.currentTimeMillis())));
-		newsFeeds.add(new NewsVO("Check thisss out!","description","http://www.tagesschau.de/inland/geheimdienste110.html", new Date(System.currentTimeMillis())));
-		newsFeeds.add(new NewsVO("Whats going on in Berlin, master of masters is coming!","discription","http://www.rbb-online.de/nachrichten/politik/2013_06/obama_besuch_sorgt_fuer_ausnahmezustand.html", new Date(System.currentTimeMillis())));
-		
+
 		//experimental Hyperlink	
 		List<Node> hyperlinks= new ArrayList<Node>();
 		
-		for(final NewsVO feed: newsFeeds){
+		for(final NewsVO feed: testFeeds){
 			
 			Hyperlink actualLink = HyperlinkBuilder.create()
 			.textFill(Color.BLACK)
@@ -320,6 +350,7 @@ public class StockChartGUI extends Application {
 				
 				Hyperlink actualLink = HyperlinkBuilder.create()
 				.textFill(Color.WHITE)
+				.font(Font.font("Verdana", FontWeight.BOLD, 10))
 				.text(feed.getTitle())
 				.translateY(3)
 				.tooltip(new Tooltip(feed.getUrl()))
@@ -345,6 +376,57 @@ public class StockChartGUI extends Application {
 			}
 		}
 		
+		// insert Stock values in red or green color
+		//*****************************************************
+		
+		
+		//with testseries
+		
+		double stockDayDiff= testSeries.getData().get(0).getYValue().doubleValue()-testSeries.getData().get(testSeries.getData().size()-1).getYValue().doubleValue();
+		//TODO percentage
+		
+		
+		hyperlinks.add(TextBuilder
+				.create()
+				.text("  +++++  ")
+				.font(Font.font("Verdana", FontWeight.BOLD, 12))
+				.translateY(3)
+				.fill(Color.WHITE).build());
+		
+		
+		if(stockDayDiff>=0d){
+			
+			hyperlinks.add(TextBuilder
+					.create()
+					.text("  "+ testSeries.getName() + " " + stockDayDiff+ "%")
+					.font(Font.font("Verdana", FontWeight.BOLD, 12))
+					.translateY(3)
+					.fill(Color.DARKGREEN).build());
+			
+		}else{
+			
+			hyperlinks.add(TextBuilder
+					.create()
+					.text("  "+ testSeries.getName() + " " + stockDayDiff+ "%")
+					.font(Font.font("Verdana", FontWeight.BOLD, 12))
+					.translateY(3)
+					.fill(Color.DARKRED).build());
+			
+		}
+
+		
+		
+		
+		hyperlinks.add(TextBuilder
+				.create()
+				.text("  +++++  ")
+				.translateY(3)
+				.fill(Color.WHITE).build());
+	
+		
+		
+		
+		//****************************************************************
 		
 		Group tickerStripe= new Group();
 		tickerStripe.setLayoutX(0);
