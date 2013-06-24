@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyIntegerProperty;
@@ -19,14 +20,27 @@ import javafx.stage.Stage;
 public class NewAdvancedAndFancyAppModel {
 	private ArrayList<ChartVO> chartList;
 	private ChartVO selectedChart;
+	private ArrayList<String> chartNames;
 	private ObservableList<String> chartNamesList;
 	private ListProperty<String> chartNamesListNew;
 	private ChoiceBox<String> choiceBox;
 	
-	public NewAdvancedAndFancyAppModel(ChoiceBox choiceBox) {
-		chartList = new ArrayList<ChartVO>();
-		chartNamesList = FXCollections.observableArrayList();
-		this.choiceBox = choiceBox;
+	public NewAdvancedAndFancyAppModel(ChoiceBox<String> choiceBox) {
+//		chartList = new ArrayList<ChartVO>();
+		
+		chartNames = new ArrayList<String>();
+		chartNames.add("test123");
+//		chartNamesProperty = new 
+
+		final ObservableList<String> chartNamesList = FXCollections.<String>observableList(chartNames);
+	      
+//		ChoiceBox<String> blubb= new ChoiceBox<String>();
+//		Bindings.bindContentBidirectional(chartNamesList, choiceBox.itemsProperty().get());
+		Bindings.bindContent(chartNames, choiceBox.itemsProperty().get());
+		
+		chartNames.add("test");
+		chartNames.add("rest2");
+	      
 	}
 	
 	/**
