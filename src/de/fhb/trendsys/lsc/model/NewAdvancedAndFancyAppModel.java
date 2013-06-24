@@ -14,32 +14,44 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.ChoiceBox;
 import javafx.stage.Stage;
 
 public class NewAdvancedAndFancyAppModel {
-	private ArrayList<ChartVO> chartList;
-	private ChartVO selectedChart;
-	private ArrayList<String> chartNames;
-	private ObservableList<String> chartNamesList;
-	private ListProperty<String> chartNamesListNew;
-	private ChoiceBox<String> choiceBox;
 	
-	public NewAdvancedAndFancyAppModel(ChoiceBox<String> choiceBox) {
-//		chartList = new ArrayList<ChartVO>();
+	private ArrayList<ChartVO> chartList;
+	private ArrayList<String> chartNames;
+	
+	private ObservableList<String> chartNamesList;
+	
+	//XXX Achtung das ding hat schon ne observableList intusss selectedChart.getData();
+	private XYChart.Series<String, Number> selectedChart; 
+	
+	
+	
+	public void update(){
+		
+		//TODO hier muss regelmäßig (Thread) unbedingt
+		//von der ArrayList von ChartVOs in die einzelnen
+		//ObservableLists geschrieben werden
+		
+		for(ChartVO currentChart : chartList){
+			
+			//TODO
+		}
+		
+	}
+	
+	public NewAdvancedAndFancyAppModel() {
+		chartList = new ArrayList<ChartVO>();
+		selectedChart= new XYChart.Series<String, Number>();
 		
 		chartNames = new ArrayList<String>();
-		chartNames.add("test123");
-//		chartNamesProperty = new 
-
-		final ObservableList<String> chartNamesList = FXCollections.<String>observableList(chartNames);
-	      
-//		ChoiceBox<String> blubb= new ChoiceBox<String>();
-//		Bindings.bindContentBidirectional(chartNamesList, choiceBox.itemsProperty().get());
-		Bindings.bindContent(chartNames, choiceBox.itemsProperty().get());
-		
-		chartNames.add("test");
-		chartNames.add("rest2");
+		chartNamesList = FXCollections.<String>observableList(chartNames);
+		//test
+//		chartNames.add("test");
+//		chartNames.add("rest2");
 	      
 	}
 	
@@ -50,23 +62,24 @@ public class NewAdvancedAndFancyAppModel {
 		return chartList;
 	}
 	
-	/**
-	 * @return the chartNamesListNew
-	 */
-	public ListProperty<String> getChartNamesListNew() {
-		return chartNamesListNew;
-	}
-
-	/**
-	 * @param chartNamesListNew the chartNamesListNew to set
-	 */
-	public void setChartNamesListNew(ListProperty<String> chartNamesListNew) {
-		this.chartNamesListNew = chartNamesListNew;
-	}
+//	/**
+//	 * @return the chartNamesListNew
+//	 */
+//	public ListProperty<String> getChartNamesListNew() {
+//		return chartNamesListNew;
+//	}
+//
+//	/**
+//	 * @param chartNamesListNew the chartNamesListNew to set
+//	 */
+//	public void setChartNamesListNew(ListProperty<String> chartNamesListNew) {
+//		this.chartNamesListNew = chartNamesListNew;
+//	}
 
 	public void addToChartList(final ChartVO chart) {
 		this.chartList.add(chart);
-		choiceBox.getItems().add(chart.getName());
+		chartNames.add(chart.getName());
+//		choiceBox.getItems().add(chart.getName());
 		//this.chartNamesList.add(chart.getName());
 		/*Platform.runLater(new Runnable() {
 										  @Override
@@ -87,18 +100,19 @@ public class NewAdvancedAndFancyAppModel {
 	public void setChartList(ArrayList<ChartVO> chartList) {
 		this.chartList = chartList;
 	}
-	/**
-	 * @return ausgewählte Aktie
-	 */
-	public ChartVO getSelectedChart() {
-		return selectedChart;
-	}
-	/**
-	 * @param ausgewählte Aktie
-	 */
-	public void setSelectedChart(ChartVO selectedChart) {
-		this.selectedChart = selectedChart;
-	}
+//	/**
+//	 * @return ausgewählte Aktie
+//	 */
+//	public ChartVO getSelectedChart() {
+//		return selectedChart;
+//	}
+//	
+//	/**
+//	 * @param ausgewählte Aktie
+//	 */
+//	public void setSelectedChart(ChartVO selectedChart) {
+//		this.selectedChart = selectedChart;
+//	}
 	
 	/**
 	 * @return Liste der neusten News jeder Aktie
@@ -118,6 +132,11 @@ public class NewAdvancedAndFancyAppModel {
 		return returnList;
 	}
 	
+	public XYChart.Series<String, Number> getSelectedChart() {
+		return selectedChart;
+	}
+	
+
 	/**
 	 * Gibt eine Aktie mit der passenden Datenbank-ID zurück.
 	 * Wird keine gefunden, wird null zurückgegeben.
@@ -150,6 +169,19 @@ public class NewAdvancedAndFancyAppModel {
 		}
 		
 		return null;
+	}
+	
+	/**
+	 * setzte die Daten für das Chart anhand des Bezeichners, falls vorhanden
+	 * @param name
+	 */
+	public void setChartByName(String name) {
+		for (ChartVO chart : chartList) {
+			if (chart.getName().equals(name)){
+				this.selectedChart.getData().setAll(chart.getChart().getData());	
+			}
+				
+		}
 	}
 	
 	/**

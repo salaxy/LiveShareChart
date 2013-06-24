@@ -29,6 +29,7 @@ public class BusinessLogic {
 	 * Informiert den {@link Worker}-Thread, jetzt zu überprüfen, ob er zu arbeiten hat.
 	 */
 	public void refresh(){
+		System.out.println("refresh in Businesslogic");
 		Worker updateWorker = Worker.getInstance(model);
 		synchronized (updateWorker) {
 			updateWorker.notify();

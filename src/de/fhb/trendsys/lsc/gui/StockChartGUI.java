@@ -10,6 +10,7 @@ import javafx.animation.Interpolator;
 import javafx.animation.TranslateTransition;
 import javafx.animation.TranslateTransitionBuilder;
 import javafx.application.Application;
+import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -69,6 +70,8 @@ public class StockChartGUI extends Application {
 	private Group webTabGroup;
 	private NewsContentPane webContainer;
 	private ChoiceBox<String> choiceBox;
+	
+    final ObservableList<String> choiceBoxData = FXCollections.<String>emptyObservableList();
 	private TilePane stockNewsPane;
 	private Button bigRedButton;
 	
@@ -108,6 +111,7 @@ public class StockChartGUI extends Application {
 	@Override
 	public void start(Stage stage) throws Exception {
 		initTestData();
+		model = new NewAdvancedAndFancyAppModel();
 		this.init(stage);
 		stage.show();
 	}
@@ -135,11 +139,7 @@ public class StockChartGUI extends Application {
 	}
 
 	private void init(Stage stage) {
-
-		choiceBox = createChoiceBox();
-		choiceBox.setLayoutX(30);
-		choiceBox.setLayoutY(15);
-
+		
 		Group root = new Group();
 		Scene scene = new Scene(root, 950, 650);
 		stage.setScene(scene);
@@ -156,9 +156,9 @@ public class StockChartGUI extends Application {
 		chart.setPrefSize(600, 600);
 		chartTabGroup.getChildren().add(chart);
 
-		//ChoiceBox<String> choice = createChoiceBox();
-		//choice.setLayoutX(30);
-		//choice.setLayoutY(15);
+		choiceBox = createChoiceBox();
+		choiceBox.setLayoutX(30);
+		choiceBox.setLayoutY(15);
 		chartTabGroup.getChildren().add(choiceBox);
 
 		stockNewsPane = createStockNewsPane();
@@ -174,13 +174,13 @@ public class StockChartGUI extends Application {
 		bigRedButton= createBigRedButton();
 		chartTabGroup.getChildren().add(bigRedButton);
 
-		model = new NewAdvancedAndFancyAppModel(choiceBox);
+
 		logic = new BusinessLogic(model);
 		
 		//hier erst das erste mal zeichnen!!!
 		System.out.println("Refreshing GUI...");		
-		logic.refresh();
-		this.refresh();
+		logic.refresh(1);
+//		this.refresh();
 		System.out.println("Refresh finished.");
 		
 		
@@ -197,7 +197,7 @@ public class StockChartGUI extends Application {
 			@Override
 			public void handle(ActionEvent e) {
 				button.setText("BÄMMMMMMMMM!!!!");
-//				logic.refresh(1);
+				logic.refresh();
 //				
 //				// aktualisiere Chart
 //				model.setSelectedChart(model.returnChartById(1));
@@ -216,6 +216,8 @@ public class StockChartGUI extends Application {
 					System.out.println(act);
 				}
 				
+//				choiceBox.itemsProperty().get().add(millisToHHMM(System.currentTimeMillis()));
+//				model.getChartNamesList().add("test");
 			}
 
 		});
@@ -234,13 +236,13 @@ public class StockChartGUI extends Application {
 		
 		//TODO chart refresh
 		
-		String selectedStock= choiceBox.getSelectionModel().getSelectedItem();
-		if(selectedStock!=null){
-			lineChart.setTitle(selectedStock);
-			lineChart.setUserData(model.getSelectedChart());
-			lineChart.getData().clear();
-			lineChart.getData().add(model.getSelectedChart().getChart());
-		}
+//		String selectedStock= choiceBox.getSelectionModel().getSelectedItem();
+//		if(model.getSelectedChart()!=null){
+//			lineChart.setTitle(selectedStock);
+//			lineChart.setUserData(model.getSelectedChart());
+//			lineChart.getData().clear();
+//			lineChart.getData().add(model.getSelectedChart().getChart());
+//		}
 		
 		
 		//TODO ticker
@@ -277,10 +279,7 @@ public class StockChartGUI extends Application {
 		stockNewsPane.setStyle("-fx-background-color: F9FCB6;");
 		stockNewsPane.setPadding(new Insets(10, 10, 10, 10));
 		stockNewsPane.setPrefColumns(1);
-
 		stockNewsPane.setTileAlignment(Pos.CENTER_LEFT);
-		
-		//TestData
 
 		//experimental Hyperlink	
 		List<Node> hyperlinks= new ArrayList<Node>();
@@ -303,19 +302,8 @@ public class StockChartGUI extends Application {
 	            	webContainer.webEngine.load(feed.getUrl());
 	            }
 	        });
-			
-//			hyperlinks.add(actualLink);
-//			hyperlinks.add(TextBuilder
-//					.create()
-//					.text("  +++++  ")
-//					.translateY(3)
-//					.fill(Color.WHITE).build());
-			
-			
-			
-//			stockNewsPane.getChildren().add(new Button());
-			stockNewsPane.getChildren().add(actualLink);
-			
+
+			stockNewsPane.getChildren().add(actualLink);	
 		}
 
 		return 	stockNewsPane;
@@ -352,37 +340,37 @@ public class StockChartGUI extends Application {
 		List<Node> hyperlinks= new ArrayList<Node>();
 		
 		//erzeuge Hyperlinks mit Listener und fuege sie der Liste hinzu
-		if (this.model!= null)
-		if (this.model.getSelectedChart() != null) {
-			for(final NewsVO feed: this.model.getSelectedChart().getNewsFeeds()){
-				
-				Hyperlink actualLink = HyperlinkBuilder.create()
-				.textFill(Color.WHITE)
-				.font(Font.font("Verdana", FontWeight.BOLD, 10))
-				.text(feed.getTitle())
-				.translateY(3)
-				.tooltip(new Tooltip(feed.getUrl()))
-				.build();
-				
-				
-				actualLink.setOnAction(new EventHandler<ActionEvent>() {
-		            @Override
-		            public void handle(ActionEvent e) {
-		            	System.out.println("This link is clicked: " + feed.getUrl());
-		            	tabPane.getSelectionModel().select(webTab);
-		            	webContainer.webEngine.load(feed.getUrl());
-		            }
-		        });
-				
-				hyperlinks.add(actualLink);
-				hyperlinks.add(TextBuilder
-						.create()
-						.text("  +++++  ")
-						.translateY(3)
-						.fill(Color.WHITE).build());
-				
-			}
-		}
+//		if (this.model!= null)
+//		if (this.model.getSelectedChart() != null) {
+//			for(final NewsVO feed: this.model.getSelectedChart().getNewsFeeds()){
+//				
+//				Hyperlink actualLink = HyperlinkBuilder.create()
+//				.textFill(Color.WHITE)
+//				.font(Font.font("Verdana", FontWeight.BOLD, 10))
+//				.text(feed.getTitle())
+//				.translateY(3)
+//				.tooltip(new Tooltip(feed.getUrl()))
+//				.build();
+//				
+//				
+//				actualLink.setOnAction(new EventHandler<ActionEvent>() {
+//		            @Override
+//		            public void handle(ActionEvent e) {
+//		            	System.out.println("This link is clicked: " + feed.getUrl());
+//		            	tabPane.getSelectionModel().select(webTab);
+//		            	webContainer.webEngine.load(feed.getUrl());
+//		            }
+//		        });
+//				
+//				hyperlinks.add(actualLink);
+//				hyperlinks.add(TextBuilder
+//						.create()
+//						.text("  +++++  ")
+//						.translateY(3)
+//						.fill(Color.WHITE).build());
+//				
+//			}
+//		}
 		
 		// insert Stock values in red or green color
 		//*****************************************************
@@ -462,14 +450,8 @@ public class StockChartGUI extends Application {
 
 	protected ChoiceBox<String> createChoiceBox() {
 
-		choiceBox = new ChoiceBox<String>();
-//		ObservableList<String> list = FXCollections.observableArrayList();
-//		choiceBox.setItems(list);
+		choiceBox = new ChoiceBox<String>(this.model.getChartNamesList());
 		
-		
-		
-		//choiceBox.setItems(this.model.getChartNamesList());
-		//choiceBox.setUserData(this.model.getChartNamesList());
 		choiceBox.getSelectionModel().selectFirst();
 		choiceBox.valueProperty().addListener(new ChangeListener<String>() {
 
@@ -479,12 +461,12 @@ public class StockChartGUI extends Application {
 
 				System.out.println("ChoiceBox: " + name);
 
-				model.setSelectedChart(model.returnChartByName(name));
+				model.setChartByName(name);
 				// aktualisiere Chart
 				lineChart.setTitle(name);
-				lineChart.setUserData(model.getSelectedChart().getChart());
-				lineChart.getData().clear();
-				lineChart.getData().add(model.getSelectedChart().getChart());
+//				lineChart.setUserData(model.getSelectedChart().getChart());
+//				lineChart.getData().clear();
+//				lineChart.getData().add(model.getSelectedChart().getChart());
 			}
 
 		});
@@ -498,8 +480,10 @@ public class StockChartGUI extends Application {
 		xAxis.setLabel("Time");
 		yAxis = new NumberAxis();
 		yAxis = new NumberAxis(0, 100, 1);
-
-		lineChart = new LineChart<String, Number>(xAxis, yAxis);
+		
+		lineChart=new LineChart<>(xAxis, yAxis);	
+		// Model mit linechart verknuepfen - Databinding
+		lineChart.setUserData(this.model.getSelectedChart());
 
 		// linechrt config
 		lineChart.setId("Stockchart");
@@ -511,10 +495,7 @@ public class StockChartGUI extends Application {
 		// xAxis.setForceZeroInRange(false);
 		yAxis.setLabel("Preis");
 		yAxis.setTickLabelFormatter(new NumberAxis.DefaultFormatter(yAxis, "$", null));
-
-		// Daten mit linechart verknuepfen - Databinding
-//		lineChart.getData().add(model.getDataSeries());
-
+	
 		return lineChart;
 	}
 	
