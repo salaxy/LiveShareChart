@@ -1,6 +1,7 @@
 package de.fhb.trendsys.lsc.gui;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javafx.animation.Interpolator;
@@ -13,6 +14,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -24,13 +27,15 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.HyperlinkBuilder;
-import javafx.scene.control.ListView;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.TilePane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.RectangleBuilder;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextBuilder;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -60,8 +65,7 @@ public class StockChartGUI extends Application {
 	private Group webTabGroup;
 	private NewsContentPane webContainer;
 	private ChoiceBox<String> choiceBox;
-//	private FlowPane listView;
-	private ListView<String> listView;
+	private TilePane stockNewsPane;
 
 	@Override
 	public void start(Stage stage) throws Exception {
@@ -121,11 +125,11 @@ public class StockChartGUI extends Application {
 		//choice.setLayoutY(15);
 		chartTabGroup.getChildren().add(choice);
 
-		ListView<String> listView = createListView();
-		listView.setLayoutX(620);
-		listView.setLayoutY(45);
-		listView.setPrefSize(300, 525);
-		chartTabGroup.getChildren().add(listView);
+		stockNewsPane = createStockNewsPane();
+		stockNewsPane.setLayoutX(620);
+		stockNewsPane.setLayoutY(45);
+		stockNewsPane.setPrefSize(300, 525);
+		chartTabGroup.getChildren().add(stockNewsPane);
 
 		Group newsTicker = createNewsTicker(stage);
 		newsTicker.toFront();
@@ -189,7 +193,7 @@ public class StockChartGUI extends Application {
 		
 		//TODO listView refresh
 		
-		listView.getItems().clear();
+//		listView.getItems().clear();
 		/*for(final NewsVO feed: this.model.getSelectedChart().getNewsFeeds()){
 			
 			Hyperlink actualLink = HyperlinkBuilder.create()
@@ -208,21 +212,78 @@ public class StockChartGUI extends Application {
 
 	}
 
-	protected ListView<String> createListView() {
+	protected TilePane createStockNewsPane() {
 
 		//TODO Anbindung ans Model
 		
-		listView = new ListView<String>();
-		listView.setItems(FXCollections.observableArrayList(
+		stockNewsPane = new TilePane();
+//		stockNewsPane.setStyle("-fx-background-color: DAE6F3;");
+//		stockNewsPane.setOrientation(Orientation.VERTICAL);
+		stockNewsPane.setStyle("-fx-background-color: F9FCB6;");
+		stockNewsPane.setPadding(new Insets(10, 10, 10, 10));
+		stockNewsPane.setPrefColumns(1);
 
-		"Row 1", "Row 2", "Long Row 3", "Row 4", "Row 5", "Row 6", "Row 7",
-				"Row 8", "Row 9", "Row 10", "Row 11", "Row 12", "Row 13",
-				"Row 14", "Row 15", "Row 16", "Row 17", "Row 18", "Row 19",
-				"Row 20"
+		stockNewsPane.setTileAlignment(Pos.CENTER_LEFT);
+		
+		//TestData
+		ArrayList<NewsVO> newsFeeds= new ArrayList<NewsVO>();
+		newsFeeds.add(new NewsVO("Flying away, amaizing machines!","description","http://www.tagesschau.de/inland/eurohawk152.html", new Date(System.currentTimeMillis())));
+		newsFeeds.add(new NewsVO("Water, water annnd water again!","description","http://www.tagesschau.de/inland/hochwasser1142.html", new Date(System.currentTimeMillis())));
+		newsFeeds.add(new NewsVO("Dictator at work!","description","http://www.tagesschau.de/ausland/eu-erdogan100.html", new Date(System.currentTimeMillis())));
+		newsFeeds.add(new NewsVO("Check thisss out!","description","http://www.tagesschau.de/inland/geheimdienste110.html", new Date(System.currentTimeMillis())));
+		newsFeeds.add(new NewsVO("Whats going on in Berlin, master of masters is coming!","discription","http://www.rbb-online.de/nachrichten/politik/2013_06/obama_besuch_sorgt_fuer_ausnahmezustand.html", new Date(System.currentTimeMillis())));
+		
+		//experimental Hyperlink	
+		List<Node> hyperlinks= new ArrayList<Node>();
+		
+		for(final NewsVO feed: newsFeeds){
+			
+			Hyperlink actualLink = HyperlinkBuilder.create()
+			.textFill(Color.BLACK)
+			.font(Font.font("Verdana", FontWeight.BOLD, 10))
+			.text(feed.getTitle())
+			.tooltip(new Tooltip(feed.getUrl()))
+			.build();
+			
+			
+			actualLink.setOnAction(new EventHandler<ActionEvent>() {
+	            @Override
+	            public void handle(ActionEvent e) {
+	            	System.out.println("This link is clicked: " + feed.getUrl());
+	            	tabPane.getSelectionModel().select(webTab);
+	            	webContainer.webEngine.load(feed.getUrl());
+	            }
+	        });
+			
+//			hyperlinks.add(actualLink);
+//			hyperlinks.add(TextBuilder
+//					.create()
+//					.text("  +++++  ")
+//					.translateY(3)
+//					.fill(Color.WHITE).build());
+			
+			
+			
+//			stockNewsPane.getChildren().add(new Button());
+			stockNewsPane.getChildren().add(actualLink);
+			
+		}
+		
 
-		));
+		
+		
+		
+//		listView = new ListView<String>();
+//		listView.setItems(FXCollections.observableArrayList(
+//
+//		"Row 1", "Row 2", "Long Row 3", "Row 4", "Row 5", "Row 6", "Row 7",
+//				"Row 8", "Row 9", "Row 10", "Row 11", "Row 12", "Row 13",
+//				"Row 14", "Row 15", "Row 16", "Row 17", "Row 18", "Row 19",
+//				"Row 20"
+//
+//		));
 
-		return listView;
+		return 	stockNewsPane;
 	}
 
 	protected Group createNewsTicker(Stage stage) {
