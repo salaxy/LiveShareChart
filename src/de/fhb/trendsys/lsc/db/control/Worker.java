@@ -26,7 +26,7 @@ import de.fhb.trendsys.lsc.model.NewsVO;
  */
 public class Worker extends Thread {
 	private static Worker instance;
-	private static final long FAST_UPDATE_DELAY = 10000; // 1 Min.
+	private static final long FAST_UPDATE_DELAY = 60000; // 1 Min.
 	private static final long SLOW_UPDATE_RATE = FAST_UPDATE_DELAY * 10;
 	
 	private DynamoDBHandler ddbClient;

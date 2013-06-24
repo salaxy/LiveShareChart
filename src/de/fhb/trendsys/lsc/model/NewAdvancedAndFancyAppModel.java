@@ -1,22 +1,14 @@
 package de.fhb.trendsys.lsc.model;
 
 import java.util.ArrayList;
+import java.util.Date;
 
-import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
-import javafx.beans.binding.Bindings;
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.ReadOnlyIntegerProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.ChoiceBox;
-import javafx.stage.Stage;
+import javafx.scene.chart.XYChart.Data;
+import javafx.scene.chart.XYChart.Series;
+import de.fhb.trendsys.lsc.gui.StockChartGUI;
 
 public class NewAdvancedAndFancyAppModel {
 	
@@ -24,9 +16,11 @@ public class NewAdvancedAndFancyAppModel {
 	private ArrayList<String> chartNames;
 	
 	private ObservableList<String> chartNamesList;
+	ObservableList<Data<String, Number>> selectedObservableList;
 	
 	//XXX Achtung das ding hat schon ne observableList intusss selectedChart.getData();
-	private XYChart.Series<String, Number> selectedChart; 
+	private XYChart.Series<String, Number> selectedChart;
+	
 	
 	
 	
@@ -35,8 +29,17 @@ public class NewAdvancedAndFancyAppModel {
 		//TODO hier muss regelmäßig (Thread) unbedingt
 		//von der ArrayList von ChartVOs in die einzelnen
 		//ObservableLists geschrieben werden
+		int i=0;
+		chartNamesList.clear();
 		
 		for(ChartVO currentChart : chartList){
+			
+			System.out.println("Chartname: "+currentChart.getName());
+			chartNamesList.add(currentChart.getName());
+			
+			if(i==0){
+				this.getCurrentChartByName(currentChart.getName());
+			}
 			
 			//TODO
 		}
@@ -45,9 +48,17 @@ public class NewAdvancedAndFancyAppModel {
 	
 	public NewAdvancedAndFancyAppModel() {
 		chartList = new ArrayList<ChartVO>();
+		
 		selectedChart= new XYChart.Series<String, Number>();
+		selectedObservableList = FXCollections.observableArrayList();
+		selectedChart.setData(selectedObservableList);
+		selectedChart.getData().add(new XYChart.Data(StockChartGUI.millisToHHMM(System.currentTimeMillis()+(1*6000)), 16));
+		selectedChart.getData().add(new XYChart.Data(StockChartGUI.millisToHHMM(System.currentTimeMillis()+(2*6000)), 13));
+		
+		selectedChart.setName("dummyChart");
 		
 		chartNames = new ArrayList<String>();
+		chartNames.add("dummy");
 		chartNamesList = FXCollections.<String>observableList(chartNames);
 		//test
 //		chartNames.add("test");
@@ -58,23 +69,9 @@ public class NewAdvancedAndFancyAppModel {
 	/**
 	 * @return Liste aller Aktiendaten
 	 */
-	private ArrayList<ChartVO> getChartList() {
+	public ArrayList<ChartVO> getChartList() {
 		return chartList;
 	}
-	
-//	/**
-//	 * @return the chartNamesListNew
-//	 */
-//	public ListProperty<String> getChartNamesListNew() {
-//		return chartNamesListNew;
-//	}
-//
-//	/**
-//	 * @param chartNamesListNew the chartNamesListNew to set
-//	 */
-//	public void setChartNamesListNew(ListProperty<String> chartNamesListNew) {
-//		this.chartNamesListNew = chartNamesListNew;
-//	}
 
 	public void addToChartList(final ChartVO chart) {
 		this.chartList.add(chart);
@@ -132,8 +129,8 @@ public class NewAdvancedAndFancyAppModel {
 		return returnList;
 	}
 	
-	public XYChart.Series<String, Number> getSelectedChart() {
-		return selectedChart;
+	public ObservableList<Data<String, Number>> getSelectedChart() {
+		return selectedObservableList;
 	}
 	
 
@@ -173,15 +170,25 @@ public class NewAdvancedAndFancyAppModel {
 	
 	/**
 	 * setzte die Daten für das Chart anhand des Bezeichners, falls vorhanden
+	 * returns null, wenn nicht gefunden
 	 * @param name
+	 * @return 
 	 */
-	public void setChartByName(String name) {
+	public Series<String,Number> getCurrentChartByName(String name) {
 		for (ChartVO chart : chartList) {
-			if (chart.getName().equals(name)){
-				this.selectedChart.getData().setAll(chart.getChart().getData());	
+			if (name!=null&&chart.getName().equals(name)){
+//				this.selectedChart.getData().setAll(chart.getChart().getData());
+				return chart.getChart();
+				
+//				selectedObservableList.clear();
+//				selectedObservableList.addAll(chart.getChart().getData());
+//				
+//				System.out.println("im Model: "+ chart.getName() + " ausgewählt");
+				
 			}
 				
 		}
+		return null;
 	}
 	
 	/**
@@ -196,5 +203,71 @@ public class NewAdvancedAndFancyAppModel {
 	 */
 	public void setChartNamesList(ObservableList<String> chartNamesList) {
 		this.chartNamesList = chartNamesList;
+	}
+	
+	
+	public void initTestData(){
+		
+		
+		Series<String, Number> testSeries;
+		ArrayList<NewsVO> testFeeds;
+		
+		testSeries = new XYChart.Series<String, Number>();
+		testSeries.setName("Microsoft");
+		
+		testSeries.getData().add(new XYChart.Data(StockChartGUI.millisToHHMM(System.currentTimeMillis()+(1*60000)), 22));
+		testSeries.getData().add(new XYChart.Data(StockChartGUI.millisToHHMM(System.currentTimeMillis()+(2*60000)), 13));
+		testSeries.getData().add(new XYChart.Data(StockChartGUI.millisToHHMM(System.currentTimeMillis()+(3*60000)), 16));
+		testSeries.getData().add(new XYChart.Data(StockChartGUI.millisToHHMM(System.currentTimeMillis()+(4*60000)), 23));
+		testSeries.getData().add(new XYChart.Data(StockChartGUI.millisToHHMM(System.currentTimeMillis()+(5*60000)), 35));
+		testSeries.getData().add(new XYChart.Data(StockChartGUI.millisToHHMM(System.currentTimeMillis()+(6*60000)), 33));
+		testSeries.getData().add(new XYChart.Data(StockChartGUI.millisToHHMM(System.currentTimeMillis()+(7*60000)), 40));
+		testSeries.getData().add(new XYChart.Data(StockChartGUI.millisToHHMM(System.currentTimeMillis()+(8*60000)), 44));
+		testSeries.getData().add(new XYChart.Data(StockChartGUI.millisToHHMM(System.currentTimeMillis()+(9*60000)), 35));
+		testSeries.getData().add(new XYChart.Data(StockChartGUI.millisToHHMM(System.currentTimeMillis()+(10*60000)), 30));
+		testSeries.getData().add(new XYChart.Data(StockChartGUI.millisToHHMM(System.currentTimeMillis()+(11*60000)), 28));
+		testSeries.getData().add(new XYChart.Data(StockChartGUI.millisToHHMM(System.currentTimeMillis()+(12*60000)), 30));
+		
+		testFeeds= new ArrayList<NewsVO>();
+		testFeeds.add(new NewsVO("Flying away, amaizing machines!","description","http://www.tagesschau.de/inland/eurohawk152.html", new Date(System.currentTimeMillis())));
+		testFeeds.add(new NewsVO("Water, water annnd water again!","description","http://www.tagesschau.de/inland/hochwasser1142.html", new Date(System.currentTimeMillis())));
+		testFeeds.add(new NewsVO("Dictator at work!","description","http://www.tagesschau.de/ausland/eu-erdogan100.html", new Date(System.currentTimeMillis())));
+
+		ChartVO chartOne = new ChartVO(1, "Mircosoft");
+		chartOne.setChart(testSeries);
+		chartOne.setNewsFeeds(testFeeds);
+		
+		Series<String, Number> testSeries2;
+		ArrayList<NewsVO> testFeeds2;
+		
+		testFeeds2= new ArrayList<NewsVO>();
+		testFeeds2.add(new NewsVO("Check thisss out!","description","http://www.tagesschau.de/inland/geheimdienste110.html", new Date(System.currentTimeMillis())));
+		testFeeds2.add(new NewsVO("Whats going on in Berlin, master of masters is coming!","discription","http://www.rbb-online.de/nachrichten/politik/2013_06/obama_besuch_sorgt_fuer_ausnahmezustand.html", new Date(System.currentTimeMillis())));
+		
+		testSeries2 = new XYChart.Series<String, Number>();
+		testSeries2.setName("Samsung");
+		
+		testSeries2.getData().add(new XYChart.Data(StockChartGUI.millisToHHMM(System.currentTimeMillis()+(1*60000)), 16));
+		testSeries2.getData().add(new XYChart.Data(StockChartGUI.millisToHHMM(System.currentTimeMillis()+(2*60000)), 13));
+		testSeries2.getData().add(new XYChart.Data(StockChartGUI.millisToHHMM(System.currentTimeMillis()+(3*60000)), 16));
+		testSeries2.getData().add(new XYChart.Data(StockChartGUI.millisToHHMM(System.currentTimeMillis()+(4*60000)), 23));
+		testSeries2.getData().add(new XYChart.Data(StockChartGUI.millisToHHMM(System.currentTimeMillis()+(5*60000)), 35));
+		testSeries2.getData().add(new XYChart.Data(StockChartGUI.millisToHHMM(System.currentTimeMillis()+(6*60000)), 33));
+		testSeries2.getData().add(new XYChart.Data(StockChartGUI.millisToHHMM(System.currentTimeMillis()+(7*60000)), 40));
+		testSeries2.getData().add(new XYChart.Data(StockChartGUI.millisToHHMM(System.currentTimeMillis()+(8*60000)), 44));
+		testSeries2.getData().add(new XYChart.Data(StockChartGUI.millisToHHMM(System.currentTimeMillis()+(9*60000)), 35));
+		testSeries2.getData().add(new XYChart.Data(StockChartGUI.millisToHHMM(System.currentTimeMillis()+(10*60000)), 32));
+		testSeries2.getData().add(new XYChart.Data(StockChartGUI.millisToHHMM(System.currentTimeMillis()+(11*60000)), 45));
+		testSeries2.getData().add(new XYChart.Data(StockChartGUI.millisToHHMM(System.currentTimeMillis()+(12*60000)), 50));
+		
+		ChartVO chartTwo = new ChartVO(2, "Samsung");
+		chartTwo.setChart(testSeries2);
+		chartTwo.setNewsFeeds(testFeeds2);
+		
+		
+		this.chartList.add(chartOne);
+		this.chartList.add(chartTwo);
+		
+		this.update();
 	}
 }

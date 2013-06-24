@@ -91,8 +91,8 @@ public class DynamoDBHandler {
 	 * @return Liste aller passenden Tupel
 	 */
 	public List<Map<String, AttributeValue>> getAllItems(int id) {
-//		return getAllItems(id, 86400000L);
-		return getAllItems(id, 10*86400000L);
+		return getAllItems(id, 86400000L);
+//		return getAllItems(id, 10*86400000L);
 	}
 	
 	/**

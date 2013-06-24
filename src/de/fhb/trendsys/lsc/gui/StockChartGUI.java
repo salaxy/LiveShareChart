@@ -2,6 +2,7 @@ package de.fhb.trendsys.lsc.gui;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -27,6 +28,7 @@ import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.chart.XYChart.Data;
 import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
@@ -45,6 +47,7 @@ import javafx.scene.text.TextBuilder;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import de.fhb.trendsys.lsc.db.control.BusinessLogic;
+import de.fhb.trendsys.lsc.model.ChartVO;
 import de.fhb.trendsys.lsc.model.NewAdvancedAndFancyAppModel;
 import de.fhb.trendsys.lsc.model.NewsVO;
 
@@ -75,44 +78,16 @@ public class StockChartGUI extends Application {
 	private TilePane stockNewsPane;
 	private Button bigRedButton;
 	
-	private Series<String, Number> testSeries;
-	
-	private ArrayList<NewsVO> testFeeds;
+
 	
 	
-	public void initTestData(){
-		
-		testSeries = new XYChart.Series<String, Number>();
-		testSeries.setName("TestAktie-Numbers");
-		
-		testSeries.getData().add(new XYChart.Data(this.millisToHHMM(System.currentTimeMillis()+(1*6000)), 22));
-		testSeries.getData().add(new XYChart.Data(this.millisToHHMM(System.currentTimeMillis()+(2*6000)), 13));
-		testSeries.getData().add(new XYChart.Data(this.millisToHHMM(System.currentTimeMillis()+(3*6000)), 16));
-		testSeries.getData().add(new XYChart.Data(this.millisToHHMM(System.currentTimeMillis()+(4*6000)), 23));
-		testSeries.getData().add(new XYChart.Data(this.millisToHHMM(System.currentTimeMillis()+(5*6000)), 35));
-		testSeries.getData().add(new XYChart.Data(this.millisToHHMM(System.currentTimeMillis()+(6*6000)), 33));
-		testSeries.getData().add(new XYChart.Data(this.millisToHHMM(System.currentTimeMillis()+(7*6000)), 40));
-		testSeries.getData().add(new XYChart.Data(this.millisToHHMM(System.currentTimeMillis()+(8*6000)), 44));
-		testSeries.getData().add(new XYChart.Data(this.millisToHHMM(System.currentTimeMillis()+(9*6000)), 35));
-		testSeries.getData().add(new XYChart.Data(this.millisToHHMM(System.currentTimeMillis()+(10*6000)), 30));
-		testSeries.getData().add(new XYChart.Data(this.millisToHHMM(System.currentTimeMillis()+(11*6000)), 28));
-		testSeries.getData().add(new XYChart.Data(this.millisToHHMM(System.currentTimeMillis()+(12*6000)), 30));
-		
-		
-		testFeeds= new ArrayList<NewsVO>();
-		testFeeds.add(new NewsVO("Flying away, amaizing machines!","description","http://www.tagesschau.de/inland/eurohawk152.html", new Date(System.currentTimeMillis())));
-		testFeeds.add(new NewsVO("Water, water annnd water again!","description","http://www.tagesschau.de/inland/hochwasser1142.html", new Date(System.currentTimeMillis())));
-		testFeeds.add(new NewsVO("Dictator at work!","description","http://www.tagesschau.de/ausland/eu-erdogan100.html", new Date(System.currentTimeMillis())));
-		testFeeds.add(new NewsVO("Check thisss out!","description","http://www.tagesschau.de/inland/geheimdienste110.html", new Date(System.currentTimeMillis())));
-		testFeeds.add(new NewsVO("Whats going on in Berlin, master of masters is coming!","discription","http://www.rbb-online.de/nachrichten/politik/2013_06/obama_besuch_sorgt_fuer_ausnahmezustand.html", new Date(System.currentTimeMillis())));
-		
-	}
+
 
 	@Override
 	public void start(Stage stage) throws Exception {
-		initTestData();
 		model = new NewAdvancedAndFancyAppModel();
-		this.init(stage);
+		logic = new BusinessLogic(model);
+		this.initComponents(stage);
 		stage.show();
 	}
 
@@ -138,7 +113,7 @@ public class StockChartGUI extends Application {
 		root.getChildren().add(tabPane);
 	}
 
-	private void init(Stage stage) {
+	private void initComponents(Stage stage) {
 		
 		Group root = new Group();
 		Scene scene = new Scene(root, 950, 650);
@@ -173,13 +148,11 @@ public class StockChartGUI extends Application {
 
 		bigRedButton= createBigRedButton();
 		chartTabGroup.getChildren().add(bigRedButton);
-
-
-		logic = new BusinessLogic(model);
 		
 		//hier erst das erste mal zeichnen!!!
-		System.out.println("Refreshing GUI...");		
-		logic.refresh(1);
+		System.out.println("Refreshing GUI...");	
+		//XXX zuletzt absichtlich auskommentiert um den Worker nicht aufzurufen
+//		logic.refresh(1);
 //		this.refresh();
 		System.out.println("Refresh finished.");
 		
@@ -196,8 +169,8 @@ public class StockChartGUI extends Application {
 		button.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				button.setText("BÄMMMMMMMMM!!!!");
-				logic.refresh();
+				button.setText("clicked and BÄMMMMMMMMM!!!!");
+//				logic.refresh();
 //				
 //				// aktualisiere Chart
 //				model.setSelectedChart(model.returnChartById(1));
@@ -208,12 +181,14 @@ public class StockChartGUI extends Application {
 //				
 //				choiceBox.getItems().add("bla " + System.currentTimeMillis());
 				
+				model.initTestData();
+				
 				//TODO
 				System.out.println(millisToHHMM(System.currentTimeMillis()));
 				System.out.println(choiceBox.itemsProperty().get().size());
 				
 				for(String act: choiceBox.itemsProperty().get()){
-					System.out.println(act);
+					System.out.println("button boxitem: "+act);
 				}
 				
 //				choiceBox.itemsProperty().get().add(millisToHHMM(System.currentTimeMillis()));
@@ -284,7 +259,7 @@ public class StockChartGUI extends Application {
 		//experimental Hyperlink	
 		List<Node> hyperlinks= new ArrayList<Node>();
 		
-		for(final NewsVO feed: testFeeds){
+		for(final NewsVO feed: this.model.getTickerNews()){
 			
 			Hyperlink actualLink = HyperlinkBuilder.create()
 			.textFill(Color.BLACK)
@@ -375,43 +350,51 @@ public class StockChartGUI extends Application {
 		// insert Stock values in red or green color
 		//*****************************************************
 		//with testseries
-		
-		double stockDayDiff= testSeries.getData().get(0).getYValue().doubleValue()-testSeries.getData().get(testSeries.getData().size()-1).getYValue().doubleValue();
-		double percentageDiff= 0d;
-		
-		if(stockDayDiff!=0d){
-			percentageDiff=stockDayDiff/testSeries.getData().get(0).getYValue().doubleValue();	
-		}
-		percentageDiff=-percentageDiff;
-		
-		hyperlinks.add(TextBuilder
-				.create()
-				.text("  +++++  ")
-				.font(Font.font("Verdana", FontWeight.BOLD, 12))
-				.translateY(3)
-				.fill(Color.WHITE).build());
-		
-		if(stockDayDiff>=0d){
-			hyperlinks.add(TextBuilder
-					.create()
-					.text("  "+ testSeries.getName() + " " + String.format(" %.2f", percentageDiff) + "%")
-					.font(Font.font("Verdana", FontWeight.BOLD, 12))
-					.translateY(3)
-					.fill(Color.DARKRED).build());
-		}else{
-			hyperlinks.add(TextBuilder
-					.create()
-					.text("  "+ testSeries.getName() + " " + String.format("+ %.2f", percentageDiff) + "%")
-					.font(Font.font("Verdana", FontWeight.BOLD, 12))
-					.translateY(3)
-					.fill(Color.DARKGREEN).build());	
-		}
 
-		hyperlinks.add(TextBuilder
-				.create()
-				.text("  +++++  ")
-				.translateY(3)
-				.fill(Color.WHITE).build());
+
+		for(ChartVO currentChart: this.model.getChartList()){
+			
+			ObservableList<Data<String, Number>> currentSeries = currentChart.getChart().getData();
+			String seriesName=currentChart.getName();
+		
+			double stockDayDiff= currentSeries.get(0).getYValue().doubleValue()-currentSeries.get(currentSeries.size()-1).getYValue().doubleValue();
+			double percentageDiff= 0d;
+			
+			if(stockDayDiff!=0d){
+				percentageDiff=stockDayDiff/currentSeries.get(0).getYValue().doubleValue();	
+			}
+			percentageDiff=-percentageDiff;
+			
+			hyperlinks.add(TextBuilder
+					.create()
+					.text("  +++++  ")
+					.font(Font.font("Verdana", FontWeight.BOLD, 12))
+					.translateY(3)
+					.fill(Color.WHITE).build());
+			
+			if(stockDayDiff>=0d){
+				hyperlinks.add(TextBuilder
+						.create()
+						.text("  "+ seriesName + " " + String.format(" %.2f", percentageDiff) + "%")
+						.font(Font.font("Verdana", FontWeight.BOLD, 12))
+						.translateY(3)
+						.fill(Color.DARKRED).build());
+			}else{
+				hyperlinks.add(TextBuilder
+						.create()
+						.text("  "+ seriesName + " " + String.format("+ %.2f", percentageDiff) + "%")
+						.font(Font.font("Verdana", FontWeight.BOLD, 12))
+						.translateY(3)
+						.fill(Color.DARKGREEN).build());	
+			}
+	
+			hyperlinks.add(TextBuilder
+					.create()
+					.text("  +++++  ")
+					.translateY(3)
+					.fill(Color.WHITE).build());
+			
+		}
 		//****************************************************************
 		
 		Group tickerStripe= new Group();
@@ -461,12 +444,12 @@ public class StockChartGUI extends Application {
 
 				System.out.println("ChoiceBox: " + name);
 
-				model.setChartByName(name);
-				// aktualisiere Chart
-				lineChart.setTitle(name);
-//				lineChart.setUserData(model.getSelectedChart().getChart());
-//				lineChart.getData().clear();
-//				lineChart.getData().add(model.getSelectedChart().getChart());
+				Series<String, Number> series=model.getCurrentChartByName(name);
+				if(series!=null){
+					lineChart.getData().clear();
+					lineChart.getData().setAll(series);					
+					lineChart.setTitle(series.getName());	
+				}
 			}
 
 		});
@@ -480,12 +463,9 @@ public class StockChartGUI extends Application {
 		xAxis.setLabel("Time");
 		yAxis = new NumberAxis();
 		yAxis = new NumberAxis(0, 100, 1);
-		
-		lineChart=new LineChart<>(xAxis, yAxis);	
-		// Model mit linechart verknuepfen - Databinding
-		lineChart.setUserData(this.model.getSelectedChart());
+		lineChart=new LineChart<String,Number>(xAxis, yAxis);
 
-		// linechrt config
+		// linechart config
 		lineChart.setId("Stockchart");
 		// lineChart.setCreateSymbols(false);
 		lineChart.setAnimated(false);
@@ -505,7 +485,7 @@ public class StockChartGUI extends Application {
 	 * @param millis
 	 * @return Zeit "hh:mm"
 	 */
-	public String millisToHHMM(long millis){
+	public static String millisToHHMM(long millis){
 		
 		Date d = new Date(millis);
 		Calendar c = new GregorianCalendar();
