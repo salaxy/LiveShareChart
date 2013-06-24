@@ -23,8 +23,8 @@ import de.fhb.trendsys.lsc.model.NewAdvancedAndFancyAppModel;
  */
 public class DataInputGUI extends Application {
 
-	private BusinessLogic logic;
-	private NewAdvancedAndFancyAppModel model;
+//	private BusinessLogic logic;
+//	private NewAdvancedAndFancyAppModel model;
 
 	@Override
 	public void start(Stage stage) throws Exception {
@@ -34,8 +34,8 @@ public class DataInputGUI extends Application {
 
 	private void init(Stage stage) {
 
-		model = new NewAdvancedAndFancyAppModel(this);
-		logic = new BusinessLogic(model);
+//		model = new NewAdvancedAndFancyAppModel(this);
+//		logic = new BusinessLogic(model);
 
 		Group root = new Group();
 

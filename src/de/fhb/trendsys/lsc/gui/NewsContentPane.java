@@ -6,28 +6,27 @@ import javafx.scene.layout.Region;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 
-//TODO Refractoring to NewsContentPane
-public class Browser extends Region {
+public class NewsContentPane extends Region {
 
 	private double myHeight = 300;
 	private double myWidth = 300;
 
-	final WebView browser = new WebView();
-	final WebEngine webEngine = browser.getEngine();
+	final WebView newsContentPane = new WebView();
+	final WebEngine webEngine = newsContentPane.getEngine();
 
-	public Browser() {
+	public NewsContentPane() {
 		webEngine.loadContent(getHtml("<h1>News-Content-Pane</h1>"));
-		getChildren().add(browser);
+		getChildren().add(newsContentPane);
 	}
 
-	public Browser(double height, double width) {
+	public NewsContentPane(double height, double width) {
 		this();
 		myHeight = height;
 		myWidth = width;
 	}
 
 	public WebView getWebView() {
-		return browser;
+		return newsContentPane;
 	}
 
 	public WebEngine getWebEngine() {
@@ -36,7 +35,7 @@ public class Browser extends Region {
 
 	@Override
 	protected void layoutChildren() {
-		layoutInArea(browser, 0, 0, getWidth(), getHeight(), 0, HPos.CENTER,
+		layoutInArea(newsContentPane, 0, 0, getWidth(), getHeight(), 0, HPos.CENTER,
 				VPos.CENTER);
 	}
 
@@ -56,7 +55,7 @@ public class Browser extends Region {
 	}
 
 	public void loadanotherUrl(String url) {
-		browser.getEngine().load(url);
+		newsContentPane.getEngine().load(url);
 	}
 	
 	private String getHtml(String content) {

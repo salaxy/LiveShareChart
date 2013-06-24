@@ -44,8 +44,7 @@ import de.fhb.trendsys.lsc.model.NewsVO;
  * 
  * @author Andy Klay <klay@fh-brandenburg.de>
  */
-//TODO Refractoring to StockChartGUI
-public class StockChart extends Application {
+public class StockChartGUI extends Application {
 
 	private BusinessLogic logic;
 	private NewAdvancedAndFancyAppModel model;
@@ -59,7 +58,7 @@ public class StockChart extends Application {
 	private Tab webTab;
 	private Group chartTabGroup;
 	private Group webTabGroup;
-	private Browser webContainer;
+	private NewsContentPane webContainer;
 	private ChoiceBox<String> choiceBox;
 //	private FlowPane listView;
 	private ListView<String> listView;
@@ -108,7 +107,7 @@ public class StockChart extends Application {
 
 		initTabs(root);		
 		
-		webContainer = new Browser(600, 950);
+		webContainer = new NewsContentPane(600, 950);
 		webTabGroup.getChildren().add(webContainer);
 
 		LineChart<String, Number> chart = createChart();
