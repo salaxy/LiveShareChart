@@ -1,5 +1,6 @@
 package de.fhb.trendsys.lsc.db.control;
 
+import de.fhb.trendsys.lsc.model.ChartVO;
 import de.fhb.trendsys.lsc.model.NewAdvancedAndFancyAppModel;
 
 
@@ -14,6 +15,7 @@ import de.fhb.trendsys.lsc.model.NewAdvancedAndFancyAppModel;
 public class BusinessLogic {
 
 	private NewAdvancedAndFancyAppModel model;
+	Worker updateWorker;
 
 	/**
 	 * Erzeugt eine Instanz der Businesslogik.
@@ -21,7 +23,7 @@ public class BusinessLogic {
 	 * @param model Model
 	 */
 	public BusinessLogic(NewAdvancedAndFancyAppModel model) {
-		Worker updateWorker = Worker.getInstance(model);
+		updateWorker = Worker.getInstance(model);
 		this.model=model;
 	}
 	
@@ -30,7 +32,7 @@ public class BusinessLogic {
 	 */
 	public void refresh(){
 		System.out.println("refresh in Businesslogic");
-		Worker updateWorker = Worker.getInstance(model);
+		updateWorker = Worker.getInstance(model);
 		synchronized (updateWorker) {
 			updateWorker.notify();
 		}
@@ -40,14 +42,29 @@ public class BusinessLogic {
 	 * Informiert den {@link Worker}-Thread, dass eine andere Aktie jetzt die Priorität hat.
 	 * @param id Primärschlüssel der Aktie in der Datenbank
 	 */
-	public void refresh(int id) {
-		Worker updateWorker = Worker.getInstance(model);
+	public void refreshById(int id) {
+		updateWorker = Worker.getInstance(model);
 		updateWorker.setPriorityStock(id);
 		this.refresh();
 	}
 	
+	
+	/**
+	 * Informiert den {@link Worker}-Thread, dass eine andere Aktie jetzt die Priorität hat.
+	 * @param name der Aktie in der Datenbank
+	 */
+	public void refreshByName(String name) {
+		ChartVO currentChart =this.model.returnChartByName(name);
+		
+		if(currentChart!=null){
+			updateWorker = Worker.getInstance(model);
+			updateWorker.setPriorityStock(currentChart.getId());
+			this.refresh();
+		}
+	}
+	
 	public void shutdown() {
-		Worker updateWorker = Worker.getInstance(model);
+		updateWorker = Worker.getInstance(model);
 		updateWorker.interrupt();
 	}
 }

@@ -1,9 +1,6 @@
 package de.fhb.trendsys.lsc.gui;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import javafx.animation.Interpolator;
@@ -12,7 +9,6 @@ import javafx.animation.TranslateTransitionBuilder;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -70,15 +66,10 @@ public class StockChartGUI extends Application {
 	private Group webTabGroup;
 	private NewsContentPane webContainer;
 	private ChoiceBox<String> choiceBox;
-	
-    final ObservableList<String> choiceBoxData = FXCollections.<String>emptyObservableList();
+	private FlowPane tickerFlow;
 	private TilePane stockNewsPane;
 	private Button bigRedButton;
 	
-
-	
-	
-
 
 	@Override
 	public void start(Stage stage) throws Exception {
@@ -95,10 +86,10 @@ public class StockChartGUI extends Application {
 		tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 
 		chartTab = new Tab();
-		chartTab.setText("Chart");
+		chartTab.setText("Kurse");
 
 		webTab = new Tab();
-		webTab.setText("WebView");
+		webTab.setText("Geöffneter Feed");
 
 		tabPane.getTabs().addAll(chartTab, webTab);
 		chartTabGroup = new Group();
@@ -110,6 +101,10 @@ public class StockChartGUI extends Application {
 		root.getChildren().add(tabPane);
 	}
 
+	/**
+	 * initialiseren der GUI-Komponeten
+	 * @param stage
+	 */
 	private void initComponents(Stage stage) {
 		
 		Group root = new Group();
@@ -146,14 +141,9 @@ public class StockChartGUI extends Application {
 		bigRedButton= createBigRedButton();
 		chartTabGroup.getChildren().add(bigRedButton);
 		
-		//hier erst das erste mal zeichnen!!!
 		System.out.println("Refreshing GUI...");	
-		//XXX zuletzt absichtlich auskommentiert um den Worker nicht aufzurufen
-//		logic.refresh(1);
-//		this.refresh();
+		logic.refresh();
 		System.out.println("Refresh finished.");
-		
-		
 	}
 
 	protected Button createBigRedButton() {
@@ -167,17 +157,9 @@ public class StockChartGUI extends Application {
 			@Override
 			public void handle(ActionEvent e) {
 				button.setText("clicked and BÄMMMMMMMMM!!!!");
-//				logic.refresh();
-
-				model.initTestData();
 				
-				//TODO entfernen später
-//				System.out.println(millisToHHMM(System.currentTimeMillis()));
-//				System.out.println(choiceBox.itemsProperty().get().size());
-//				
-//				for(String act: choiceBox.itemsProperty().get()){
-//					System.out.println("button boxitem: "+act);
-//				}
+				model.initTestData();
+				refreshTicker();
 			}
 
 		});
@@ -187,68 +169,27 @@ public class StockChartGUI extends Application {
 	/**
 	 * refresh des Tickerbandes
 	 */
-	protected void refresh(){
-		
-		//Choicebox refesh
-		/*this.choiceBox.getItems().clear();
-		
-		for (String actual : this.model.getChartNamesList()) {
-			this.choiceBox.getItems().add(actual);
-		}*/
-		
-		//TODO chart refresh
-		
-//		String selectedStock= choiceBox.getSelectionModel().getSelectedItem();
-//		if(model.getSelectedChart()!=null){
-//			lineChart.setTitle(selectedStock);
-//			lineChart.setUserData(model.getSelectedChart());
-//			lineChart.getData().clear();
-//			lineChart.getData().add(model.getSelectedChart().getChart());
-//		}
-		
-		
-		//TODO ticker
-		
-		
-		//TODO listView refresh
-		
-//		listView.getItems().clear();
-		/*for(final NewsVO feed: this.model.getSelectedChart().getNewsFeeds()){
-			
-			Hyperlink actualLink = HyperlinkBuilder.create()
-			.textFill(Color.WHITE)
-			.text(feed.getTitle())
-			.translateY(3)
-			.tooltip(new Tooltip(feed.getUrl()))
-			.build();
-			
-			
-//			listView.getItems().
-			
-			
-//			listView.getItems().add(actualLink);
-		}*/
-
+	protected void refreshTicker(){
+		List<Node> hyperlinks= new ArrayList<Node>();
+		addNewsToTicker(hyperlinks);
+		addStockPercentagesToTickerNodes(hyperlinks);
+		tickerFlow.getChildren().clear();
+		tickerFlow.getChildren().addAll(hyperlinks);
 	}
 
+	/**
+	 * erstellt das TilePane im Chart-Tab
+	 * @return
+	 */
 	protected TilePane createStockNewsPane() {
-
-		//TODO Anbindung ans Model
-		
 		stockNewsPane = new TilePane();
-//		stockNewsPane.setStyle("-fx-background-color: DAE6F3;");
-//		stockNewsPane.setOrientation(Orientation.VERTICAL);
-		stockNewsPane.setStyle("-fx-background-color: F9FCB6;");
+		stockNewsPane.setStyle("-fx-background-color: F9FCB6;");//DAE6F3
 		stockNewsPane.setPadding(new Insets(10, 10, 10, 10));
 		stockNewsPane.setPrefColumns(1);
 		stockNewsPane.setTileAlignment(Pos.CENTER_LEFT);
-
-//		//experimental Hyperlink	
-//		List<Node> hyperlinks= new ArrayList<Node>();
-		
 		refreshStockNewsPane("dummy");
-
-		return 	stockNewsPane;
+		
+		return stockNewsPane;
 	}
 
 	private void refreshStockNewsPane(String name) {
@@ -277,13 +218,11 @@ public class StockChartGUI extends Application {
 				stockNewsPane.getChildren().add(actualLink);	
 			}
 		}
-
 	}
 
 	protected Group createNewsTicker(Stage stage) {
 
 		Group tickerArea = new Group();
-
 		final Scene scene = stage.getScene();
 
 		javafx.scene.shape.Rectangle tickerRect = RectangleBuilder.create()
@@ -299,7 +238,6 @@ public class StockChartGUI extends Application {
 				.stroke(Color.rgb(255, 255, 255, .70)).build();
 
 		tickerArea.setClip(clipRegion);
-
 		tickerArea.setTranslateX(6);
 		tickerArea.translateYProperty().bind(
 				scene.heightProperty().subtract(tickerRect.getHeight() + 6));
@@ -307,100 +245,21 @@ public class StockChartGUI extends Application {
 		clipRegion.widthProperty().bind(scene.widthProperty().subtract(16));
 		tickerArea.getChildren().add(tickerRect);
 		
-		//experimental Hyperlink	
+		//Texte hinzufuegen
 		List<Node> hyperlinks= new ArrayList<Node>();
-		
-		//erzeuge Hyperlinks mit Listener und fuege sie der Liste hinzu
-		if (this.model!= null){
-			for(final NewsVO feed: this.model.getTickerNews()){
-				
-				Hyperlink actualLink = HyperlinkBuilder.create()
-				.textFill(Color.WHITE)
-				.font(Font.font("Verdana", FontWeight.BOLD, 10))
-				.text(feed.getTitle())
-				.translateY(3)
-				.tooltip(new Tooltip(feed.getUrl()))
-				.build();
-				
-				
-				actualLink.setOnAction(new EventHandler<ActionEvent>() {
-		            @Override
-		            public void handle(ActionEvent e) {
-		            	System.out.println("This link is clicked: " + feed.getUrl());
-		            	tabPane.getSelectionModel().select(webTab);
-		            	webContainer.webEngine.load(feed.getUrl());
-		            }
-		        });
-				
-				hyperlinks.add(actualLink);
-				hyperlinks.add(TextBuilder
-						.create()
-						.text("  +++++  ")
-						.translateY(3)
-						.fill(Color.WHITE).build());
-				
-			}
-		}
-		
-		// insert Stock values in red or green color
-		//*****************************************************
-		//with testseries
-
-
-		for(ChartVO currentChart: this.model.getChartList()){
-			
-			ObservableList<Data<String, Number>> currentSeries = currentChart.getChart().getData();
-			String seriesName=currentChart.getName();
-		
-			double stockDayDiff= currentSeries.get(0).getYValue().doubleValue()-currentSeries.get(currentSeries.size()-1).getYValue().doubleValue();
-			double percentageDiff= 0d;
-			
-			if(stockDayDiff!=0d){
-				percentageDiff=stockDayDiff/currentSeries.get(0).getYValue().doubleValue();	
-			}
-			percentageDiff=-percentageDiff;
-			
-			hyperlinks.add(TextBuilder
-					.create()
-					.text("  +++++  ")
-					.font(Font.font("Verdana", FontWeight.BOLD, 12))
-					.translateY(3)
-					.fill(Color.WHITE).build());
-			
-			if(stockDayDiff>=0d){
-				hyperlinks.add(TextBuilder
-						.create()
-						.text("  "+ seriesName + " " + String.format(" %.2f", percentageDiff) + "%")
-						.font(Font.font("Verdana", FontWeight.BOLD, 12))
-						.translateY(3)
-						.fill(Color.DARKRED).build());
-			}else{
-				hyperlinks.add(TextBuilder
-						.create()
-						.text("  "+ seriesName + " " + String.format("+ %.2f", percentageDiff) + "%")
-						.font(Font.font("Verdana", FontWeight.BOLD, 12))
-						.translateY(3)
-						.fill(Color.DARKGREEN).build());	
-			}
-	
-			hyperlinks.add(TextBuilder
-					.create()
-					.text("  +++++  ")
-					.translateY(3)
-					.fill(Color.WHITE).build());
-			
-		}
-		//****************************************************************
+		addNewsToTicker(hyperlinks);
+		addStockPercentagesToTickerNodes(hyperlinks);
 		
 		Group tickerStripe= new Group();
 		tickerStripe.setLayoutX(0);
 		tickerStripe.setLayoutY(0);
-		FlowPane tickerFlow = new FlowPane();
+		tickerFlow = new FlowPane();
 		tickerFlow.setPrefWrapLength(2000);
 		tickerStripe.getChildren().add(tickerFlow);
 		tickerFlow.getChildren().addAll(hyperlinks);
         tickerArea.getChildren().add(tickerStripe);
 
+        //Animation 
 		final TranslateTransition tickerAnimation = TranslateTransitionBuilder
 				.create().node(tickerStripe)
 				.duration(Duration.millis((scene.getWidth() / 300) * 15000))
@@ -426,6 +285,80 @@ public class StockChartGUI extends Application {
 		return tickerArea;
 	}
 
+	private void addNewsToTicker(List<Node> hyperlinks) {
+		//erzeuge Hyperlinks mit Listener und fuege sie der Liste hinzu
+		for(final NewsVO feed: this.model.getTickerNews()){
+			
+			Hyperlink actualLink = HyperlinkBuilder.create()
+			.textFill(Color.WHITE)
+			.font(Font.font("Verdana", FontWeight.BOLD, 10))
+			.text(feed.getTitle())
+			.translateY(3)
+			.tooltip(new Tooltip(feed.getUrl()))
+			.build();
+			
+			actualLink.setOnAction(new EventHandler<ActionEvent>() {
+	            @Override
+	            public void handle(ActionEvent e) {
+	            	System.out.println("This link is clicked: " + feed.getUrl());
+	            	tabPane.getSelectionModel().select(webTab);
+	            	webContainer.webEngine.load(feed.getUrl());
+	            }
+	        });
+			
+			hyperlinks.add(TextBuilder
+					.create()
+					.text("  +++++  ")
+					.translateY(3)
+					.fill(Color.WHITE).build());
+			
+			hyperlinks.add(actualLink);
+		}
+	}
+
+	/**
+	 * erstellt Text-Nodes für Prozent-Anzeigen der Aktien im Ticker
+	 * @param hyperlinks
+	 */
+	private void addStockPercentagesToTickerNodes(List<Node> hyperlinks) {
+		for(ChartVO currentChart: this.model.getChartList()){
+			
+			ObservableList<Data<String, Number>> currentSeries = currentChart.getChart().getData();
+			String seriesName=currentChart.getName();
+		
+			//TODO evtl. Berechnung in BusinessLogic
+			double stockDayDiff= currentSeries.get(0).getYValue().doubleValue()-currentSeries.get(currentSeries.size()-1).getYValue().doubleValue();
+			double percentageDiff= 0d;
+			
+			if(stockDayDiff!=0d){
+				percentageDiff=stockDayDiff/currentSeries.get(0).getYValue().doubleValue();	
+			}
+			percentageDiff=-percentageDiff;
+			
+			hyperlinks.add(TextBuilder
+					.create()
+					.text("  +++++  ")
+					.translateY(3)
+					.fill(Color.WHITE).build());
+			
+			if(stockDayDiff>=0d){
+				hyperlinks.add(TextBuilder
+						.create()
+						.text("  "+ seriesName + " " + String.format(" %.2f", percentageDiff) + "%")
+						.font(Font.font("Verdana", FontWeight.BOLD, 12))
+						.translateY(3)
+						.fill(Color.DARKRED).build());
+			}else{
+				hyperlinks.add(TextBuilder
+						.create()
+						.text("  "+ seriesName + " " + String.format("+ %.2f", percentageDiff) + "%")
+						.font(Font.font("Verdana", FontWeight.BOLD, 12))
+						.translateY(3)
+						.fill(Color.DARKGREEN).build());	
+			}
+		}
+	}
+
 	protected ChoiceBox<String> createChoiceBox() {
 
 		choiceBox = new ChoiceBox<String>(this.model.getChartNamesList());
@@ -438,7 +371,7 @@ public class StockChartGUI extends Application {
 					final String arg1, final String name) {
 
 				System.out.println("ChoiceBox: " + name);
-
+				logic.refreshByName(name);
 				refreshChart(name);
 				refreshStockNewsPane(name);
 			}
@@ -482,9 +415,6 @@ public class StockChartGUI extends Application {
 	
 		return lineChart;
 	}
-	
-	
-
 	
 	@Override
 	public void stop() throws Exception {

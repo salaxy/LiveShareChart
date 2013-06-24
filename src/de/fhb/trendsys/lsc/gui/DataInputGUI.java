@@ -11,9 +11,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Stage;
-import de.fhb.trendsys.lsc.db.control.BusinessLogic;
-import de.fhb.trendsys.lsc.model.AppModel;
-import de.fhb.trendsys.lsc.model.NewAdvancedAndFancyAppModel;
 
 /**
  * Mit dieser Klasse wird die JavaFX-Applikation gestartet, Sie beinhaltet

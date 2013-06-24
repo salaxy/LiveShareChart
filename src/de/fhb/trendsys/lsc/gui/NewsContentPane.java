@@ -6,6 +6,10 @@ import javafx.scene.layout.Region;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 
+/**
+ * GUI-Klasse zur einbettung eines browser-Fensters
+ * 
+ */
 public class NewsContentPane extends Region {
 
 	private double myHeight = 300;
@@ -54,7 +58,7 @@ public class NewsContentPane extends Region {
 		myWidth = width;
 	}
 
-	public void loadanotherUrl(String url) {
+	public void loadAnotherUrl(String url) {
 		newsContentPane.getEngine().load(url);
 	}
 	

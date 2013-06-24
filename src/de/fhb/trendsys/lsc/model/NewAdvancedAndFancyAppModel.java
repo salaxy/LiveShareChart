@@ -10,31 +10,36 @@ import javafx.collections.ObservableList;
 import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Series;
 
+/**
+ * Model - Verwaltet und hält Daten der Appliaktion
+ * 
+ * @author Andy Klay <klay@fh-brandenburg.de>
+ * @author Frank Mertens
+ */
 public class NewAdvancedAndFancyAppModel {
 	
-	private ArrayList<ChartVO> chartList;
-	private ArrayList<String> chartNames;
-	private ObservableList<String> chartNamesList;
+	private ArrayList<ChartVO> availableChartVO;
+	private ArrayList<String> availableChartNames;
+	private ObservableList<String> observableChartNames;
 
 	/**
 	 * updated die ObservableList zu den Cahrt-Names
 	 */
 	public void updateChartNames(){
-		chartNamesList.clear();
+		observableChartNames.clear();
 		
-		for(ChartVO currentChart : chartList){
-			
+		for(ChartVO currentChart : availableChartVO){
 			System.out.println("Chartname: "+currentChart.getName());
-			chartNamesList.add(currentChart.getName());
+			observableChartNames.add(currentChart.getName());
 		}
 	}
 	/**
 	 * Standard-Konstruktor mit DummyVO
 	 */
 	public NewAdvancedAndFancyAppModel() {
-		chartList = new ArrayList<ChartVO>();
-		chartNames = new ArrayList<String>();
-		chartNamesList = FXCollections.<String>observableList(chartNames);
+		availableChartVO = new ArrayList<ChartVO>();
+		availableChartNames = new ArrayList<String>();
+		observableChartNames = FXCollections.<String>observableList(availableChartNames);
 
 		//dummy nicht rausnehmen, erstmal benötigt, sonst exception in der GUI
 		createDummyChartVO();	
@@ -51,14 +56,13 @@ public class NewAdvancedAndFancyAppModel {
 		dummyChart.setName("dummyChart");
 		
 		ArrayList<NewsVO> dummyFeeds = new ArrayList<NewsVO>();
-		dummyFeeds.add(new NewsVO("Go, Goo, Goog, Googl, Google!","description","www.google.de", new Date(System.currentTimeMillis())));
+		dummyFeeds.add(new NewsVO("Go, Goo, Goog, Googl, Google!","description","http://www.google.de", new Date(System.currentTimeMillis())));
 		
 		ChartVO dummyVO = new ChartVO(-1, "dummy");
 		dummyVO.setChart(dummyChart);
 		dummyVO.setNewsFeeds(dummyFeeds);
-		chartNames.add("dummy");
-		chartList.add(dummyVO);
-		
+		availableChartNames.add("dummy");
+		availableChartVO.add(dummyVO);
 		
 	}
 	
@@ -66,32 +70,16 @@ public class NewAdvancedAndFancyAppModel {
 	 * @return Liste aller Aktiendaten
 	 */
 	public ArrayList<ChartVO> getChartList() {
-		return chartList;
+		return availableChartVO;
 	}
 
-	public void addToChartList(final ChartVO chart) {
-		this.chartList.add(chart);
-		chartNames.add(chart.getName());
-//		choiceBox.getItems().add(chart.getName());
-		//this.chartNamesList.add(chart.getName());
-		/*Platform.runLater(new Runnable() {
-										  @Override
-										  public void run() {
-											  
-											  System.out.println("chartNameList was: " + chartNamesList);
-											  chartNamesList.add(chart.getName());
-											  System.out.println("Run, Run, Run!");
-											  System.out.println("ChartNameList is now: " + chartNamesList);
-										  }
-										 });
-		*/
-	}
-	
 	/**
-	 * @param Liste aller Aktiendaten
+	 * fügt einen ChartVO hinzu zur ChartVO ArrayList
+	 * @param chart
 	 */
-	public void setChartList(ArrayList<ChartVO> chartList) {
-		this.chartList = chartList;
+	public void addToChartList(final ChartVO chart) {
+		this.availableChartVO.add(chart);
+		availableChartNames.add(chart.getName());
 	}
 	
 	/**
@@ -100,7 +88,7 @@ public class NewAdvancedAndFancyAppModel {
 	public ArrayList<NewsVO> getTickerNews() {
 		ArrayList<NewsVO> returnList = new ArrayList<NewsVO>();
 		
-		for (ChartVO chart : chartList) {
+		for (ChartVO chart : availableChartVO) {
 			ArrayList<NewsVO> newsList = chart.getNewsFeeds();
 			
 			if (newsList.size() > 0) {
@@ -122,11 +110,10 @@ public class NewAdvancedAndFancyAppModel {
 	 * @see #returnChartByName(String)
 	 */
 	public ChartVO returnChartById(int id) {
-		for (ChartVO chart : chartList) {
+		for (ChartVO chart : availableChartVO) {
 			if (chart.getId() == id)
 				return chart;
 		}
-		
 		return null;
 	}
 	
@@ -139,27 +126,25 @@ public class NewAdvancedAndFancyAppModel {
 	 * @see #returnChartById(int)
 	 */
 	public ChartVO returnChartByName(String name) {
-		for (ChartVO chart : chartList) {
+		for (ChartVO chart : availableChartVO) {
 			if (chart.getName().equals(name))
 				return chart;
 		}
-		
 		return null;
 	}
 	
 	/**
-	 * setzte die Daten für das Chart anhand des Bezeichners, falls vorhanden
-	 * returns null, wenn nicht gefunden
+	 * holt die Daten für das Chart anhand des Bezeichners, falls vorhanden
+	 * Wird keine gefunden, wird null zurückgegeben.
 	 * @param name
 	 * @return 
 	 */
 	public Series<String,Number> getCurrentChartByName(String name) {
-		for (ChartVO chart : chartList) {
+		for (ChartVO chart : availableChartVO) {
 			if (name!=null&&chart.getName().equals(name)){
 				System.out.println("im Model: "+ chart.getName() + " ausgewählt");
 				return chart.getChart();	
 			}
-				
 		}
 		return null;
 	}
@@ -168,16 +153,19 @@ public class NewAdvancedAndFancyAppModel {
 	 * @return Namen aller Aktien
 	 */
 	public ObservableList<String> getChartNamesList() {
-		return chartNamesList;
+		return observableChartNames;
 	}
 
 	/**
 	 * @param Namen aller Aktien
 	 */
 	public void setChartNamesList(ObservableList<String> chartNamesList) {
-		this.chartNamesList = chartNamesList;
+		this.observableChartNames = chartNamesList;
 	}
 	
+	/**
+	 * initialisiert Test-Daten
+	 */
 	public void initTestData(){
 		
 		Series<String, Number> testSeries;
@@ -201,7 +189,7 @@ public class NewAdvancedAndFancyAppModel {
 		
 		testFeeds= new ArrayList<NewsVO>();
 		testFeeds.add(new NewsVO("Flying away, amaizing machines!","description","http://www.tagesschau.de/inland/eurohawk152.html", new Date(System.currentTimeMillis())));
-		testFeeds.add(new NewsVO("Water, water annnd water again!","description","http://www.tagesschau.de/inland/hochwasser1142.html", new Date(System.currentTimeMillis())));
+		testFeeds.add(new NewsVO("EU findet Kompromiss zu CO2-Vorgaben für Autos","description","http://www.finanzen.net/nachricht/aktien/EU-findet-Kompromiss-zu-CO2-Vorgaben-fuer-Autos-2507406", new Date(System.currentTimeMillis())));
 		testFeeds.add(new NewsVO("Dictator at work!","description","http://www.tagesschau.de/ausland/eu-erdogan100.html", new Date(System.currentTimeMillis())));
 
 		ChartVO chartOne = new ChartVO(1, "Mircosoft");
@@ -213,31 +201,31 @@ public class NewAdvancedAndFancyAppModel {
 		
 		testFeeds2= new ArrayList<NewsVO>();
 		testFeeds2.add(new NewsVO("Check thisss out!","description","http://www.tagesschau.de/inland/geheimdienste110.html", new Date(System.currentTimeMillis())));
-		testFeeds2.add(new NewsVO("Whats going on in Berlin, master of masters is coming!","discription","http://www.rbb-online.de/nachrichten/politik/2013_06/obama_besuch_sorgt_fuer_ausnahmezustand.html", new Date(System.currentTimeMillis())));
+		testFeeds2.add(new NewsVO("USA-gehen-ebenfalls-moeglicher-Oelpreis-Manipulation-nach","discription","http://www.finanzen.net/nachricht/aktien/Kreise-USA-gehen-ebenfalls-moeglicher-Oelpreis-Manipulation-nach-2507397", new Date(System.currentTimeMillis())));
 		
 		testSeries2 = new XYChart.Series<String, Number>();
 		testSeries2.setName("Samsung");
 		
-		testSeries2.getData().add(new XYChart.Data(millisToHHMM(System.currentTimeMillis()+(1*60000)), 16));
-		testSeries2.getData().add(new XYChart.Data(millisToHHMM(System.currentTimeMillis()+(2*60000)), 13));
-		testSeries2.getData().add(new XYChart.Data(millisToHHMM(System.currentTimeMillis()+(3*60000)), 16));
-		testSeries2.getData().add(new XYChart.Data(millisToHHMM(System.currentTimeMillis()+(4*60000)), 23));
+		testSeries2.getData().add(new XYChart.Data(millisToHHMM(System.currentTimeMillis()+(1*60000)), 55));
+		testSeries2.getData().add(new XYChart.Data(millisToHHMM(System.currentTimeMillis()+(2*60000)), 45));
+		testSeries2.getData().add(new XYChart.Data(millisToHHMM(System.currentTimeMillis()+(3*60000)), 34));
+		testSeries2.getData().add(new XYChart.Data(millisToHHMM(System.currentTimeMillis()+(4*60000)), 33));
 		testSeries2.getData().add(new XYChart.Data(millisToHHMM(System.currentTimeMillis()+(5*60000)), 35));
-		testSeries2.getData().add(new XYChart.Data(millisToHHMM(System.currentTimeMillis()+(6*60000)), 33));
+		testSeries2.getData().add(new XYChart.Data(millisToHHMM(System.currentTimeMillis()+(6*60000)), 36));
 		testSeries2.getData().add(new XYChart.Data(millisToHHMM(System.currentTimeMillis()+(7*60000)), 40));
-		testSeries2.getData().add(new XYChart.Data(millisToHHMM(System.currentTimeMillis()+(8*60000)), 44));
+		testSeries2.getData().add(new XYChart.Data(millisToHHMM(System.currentTimeMillis()+(8*60000)), 42));
 		testSeries2.getData().add(new XYChart.Data(millisToHHMM(System.currentTimeMillis()+(9*60000)), 35));
-		testSeries2.getData().add(new XYChart.Data(millisToHHMM(System.currentTimeMillis()+(10*60000)), 32));
-		testSeries2.getData().add(new XYChart.Data(millisToHHMM(System.currentTimeMillis()+(11*60000)), 45));
-		testSeries2.getData().add(new XYChart.Data(millisToHHMM(System.currentTimeMillis()+(12*60000)), 50));
+		testSeries2.getData().add(new XYChart.Data(millisToHHMM(System.currentTimeMillis()+(10*60000)), 38));
+		testSeries2.getData().add(new XYChart.Data(millisToHHMM(System.currentTimeMillis()+(11*60000)), 43));
+		testSeries2.getData().add(new XYChart.Data(millisToHHMM(System.currentTimeMillis()+(12*60000)), 46));
 		
 		ChartVO chartTwo = new ChartVO(2, "Samsung");
 		chartTwo.setChart(testSeries2);
 		chartTwo.setNewsFeeds(testFeeds2);
 		
 		
-		this.chartList.add(chartOne);
-		this.chartList.add(chartTwo);
+		this.availableChartVO.add(chartOne);
+		this.availableChartVO.add(chartTwo);
 		
 		this.updateChartNames();
 	}
