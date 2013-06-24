@@ -2,7 +2,6 @@ package de.fhb.trendsys.lsc.gui;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -11,7 +10,6 @@ import javafx.animation.Interpolator;
 import javafx.animation.TranslateTransition;
 import javafx.animation.TranslateTransitionBuilder;
 import javafx.application.Application;
-import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -27,7 +25,6 @@ import javafx.scene.Scene;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Data;
 import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Button;
@@ -171,35 +168,25 @@ public class StockChartGUI extends Application {
 			public void handle(ActionEvent e) {
 				button.setText("clicked and BÄMMMMMMMMM!!!!");
 //				logic.refresh();
-//				
-//				// aktualisiere Chart
-//				model.setSelectedChart(model.returnChartById(1));
-//				lineChart.setTitle(model.getSelectedChart().getName());
-//				lineChart.setUserData(model.getSelectedChart().getChart());
-//				lineChart.getData().clear();
-//				lineChart.getData().add(model.getSelectedChart().getChart());
-//				
-//				choiceBox.getItems().add("bla " + System.currentTimeMillis());
-				
+
 				model.initTestData();
 				
-				//TODO
-				System.out.println(millisToHHMM(System.currentTimeMillis()));
-				System.out.println(choiceBox.itemsProperty().get().size());
-				
-				for(String act: choiceBox.itemsProperty().get()){
-					System.out.println("button boxitem: "+act);
-				}
-				
-//				choiceBox.itemsProperty().get().add(millisToHHMM(System.currentTimeMillis()));
-//				model.getChartNamesList().add("test");
+				//TODO entfernen später
+//				System.out.println(millisToHHMM(System.currentTimeMillis()));
+//				System.out.println(choiceBox.itemsProperty().get().size());
+//				
+//				for(String act: choiceBox.itemsProperty().get()){
+//					System.out.println("button boxitem: "+act);
+//				}
 			}
 
 		});
 		return button;
 	}
 	
-	
+	/**
+	 * refresh des Tickerbandes
+	 */
 	protected void refresh(){
 		
 		//Choicebox refesh
@@ -256,32 +243,41 @@ public class StockChartGUI extends Application {
 		stockNewsPane.setPrefColumns(1);
 		stockNewsPane.setTileAlignment(Pos.CENTER_LEFT);
 
-		//experimental Hyperlink	
-		List<Node> hyperlinks= new ArrayList<Node>();
+//		//experimental Hyperlink	
+//		List<Node> hyperlinks= new ArrayList<Node>();
 		
-		for(final NewsVO feed: this.model.getTickerNews()){
-			
-			Hyperlink actualLink = HyperlinkBuilder.create()
-			.textFill(Color.BLACK)
-			.font(Font.font("Verdana", FontWeight.BOLD, 10))
-			.text(feed.getTitle())
-			.tooltip(new Tooltip(feed.getUrl()))
-			.build();
-			
-			
-			actualLink.setOnAction(new EventHandler<ActionEvent>() {
-	            @Override
-	            public void handle(ActionEvent e) {
-	            	System.out.println("This link is clicked: " + feed.getUrl());
-	            	tabPane.getSelectionModel().select(webTab);
-	            	webContainer.webEngine.load(feed.getUrl());
-	            }
-	        });
-
-			stockNewsPane.getChildren().add(actualLink);	
-		}
+		refreshStockNewsPane("dummy");
 
 		return 	stockNewsPane;
+	}
+
+	private void refreshStockNewsPane(String name) {
+		ChartVO currentChart = this.model.returnChartByName(name);
+		
+		if(currentChart!=null){
+			stockNewsPane.getChildren().clear();
+			
+			for(final NewsVO feed: currentChart.getNewsFeeds()){
+				
+				Hyperlink actualLink = HyperlinkBuilder.create()
+				.textFill(Color.BLACK)
+				.font(Font.font("Verdana", FontWeight.BOLD, 10))
+				.text(feed.getTitle())
+				.tooltip(new Tooltip(feed.getUrl()))
+				.build();
+				
+				actualLink.setOnAction(new EventHandler<ActionEvent>() {
+		            @Override
+		            public void handle(ActionEvent e) {
+		            	tabPane.getSelectionModel().select(webTab);
+		            	webContainer.webEngine.load(feed.getUrl());
+		            }
+		        });
+	
+				stockNewsPane.getChildren().add(actualLink);	
+			}
+		}
+
 	}
 
 	protected Group createNewsTicker(Stage stage) {
@@ -315,37 +311,36 @@ public class StockChartGUI extends Application {
 		List<Node> hyperlinks= new ArrayList<Node>();
 		
 		//erzeuge Hyperlinks mit Listener und fuege sie der Liste hinzu
-//		if (this.model!= null)
-//		if (this.model.getSelectedChart() != null) {
-//			for(final NewsVO feed: this.model.getSelectedChart().getNewsFeeds()){
-//				
-//				Hyperlink actualLink = HyperlinkBuilder.create()
-//				.textFill(Color.WHITE)
-//				.font(Font.font("Verdana", FontWeight.BOLD, 10))
-//				.text(feed.getTitle())
-//				.translateY(3)
-//				.tooltip(new Tooltip(feed.getUrl()))
-//				.build();
-//				
-//				
-//				actualLink.setOnAction(new EventHandler<ActionEvent>() {
-//		            @Override
-//		            public void handle(ActionEvent e) {
-//		            	System.out.println("This link is clicked: " + feed.getUrl());
-//		            	tabPane.getSelectionModel().select(webTab);
-//		            	webContainer.webEngine.load(feed.getUrl());
-//		            }
-//		        });
-//				
-//				hyperlinks.add(actualLink);
-//				hyperlinks.add(TextBuilder
-//						.create()
-//						.text("  +++++  ")
-//						.translateY(3)
-//						.fill(Color.WHITE).build());
-//				
-//			}
-//		}
+		if (this.model!= null){
+			for(final NewsVO feed: this.model.getTickerNews()){
+				
+				Hyperlink actualLink = HyperlinkBuilder.create()
+				.textFill(Color.WHITE)
+				.font(Font.font("Verdana", FontWeight.BOLD, 10))
+				.text(feed.getTitle())
+				.translateY(3)
+				.tooltip(new Tooltip(feed.getUrl()))
+				.build();
+				
+				
+				actualLink.setOnAction(new EventHandler<ActionEvent>() {
+		            @Override
+		            public void handle(ActionEvent e) {
+		            	System.out.println("This link is clicked: " + feed.getUrl());
+		            	tabPane.getSelectionModel().select(webTab);
+		            	webContainer.webEngine.load(feed.getUrl());
+		            }
+		        });
+				
+				hyperlinks.add(actualLink);
+				hyperlinks.add(TextBuilder
+						.create()
+						.text("  +++++  ")
+						.translateY(3)
+						.fill(Color.WHITE).build());
+				
+			}
+		}
 		
 		// insert Stock values in red or green color
 		//*****************************************************
@@ -444,17 +439,24 @@ public class StockChartGUI extends Application {
 
 				System.out.println("ChoiceBox: " + name);
 
-				Series<String, Number> series=model.getCurrentChartByName(name);
-				if(series!=null){
-					lineChart.getData().clear();
-					lineChart.getData().setAll(series);					
-					lineChart.setTitle(series.getName());	
-				}
+				refreshChart(name);
+				refreshStockNewsPane(name);
 			}
-
 		});
 
 		return choiceBox;
+	}
+	/**
+	 * passt das Chart nach Auswahl der choicebox an
+	 * @param name
+	 */
+	private void refreshChart(final String name) {
+		Series<String, Number> series=model.getCurrentChartByName(name);
+		if(series!=null){
+			lineChart.getData().clear();
+			lineChart.getData().setAll(series);					
+			lineChart.setTitle(series.getName());	
+		}
 	}
 
 	protected LineChart<String, Number> createChart() {
@@ -464,6 +466,8 @@ public class StockChartGUI extends Application {
 		yAxis = new NumberAxis();
 		yAxis = new NumberAxis(0, 100, 1);
 		lineChart=new LineChart<String,Number>(xAxis, yAxis);
+		
+		refreshChart("dummy");
 
 		// linechart config
 		lineChart.setId("Stockchart");
@@ -480,21 +484,7 @@ public class StockChartGUI extends Application {
 	}
 	
 	
-	/**
-	 * wandelt Zeit von millisekunden in einen hh:mm-Formatierten String um
-	 * @param millis
-	 * @return Zeit "hh:mm"
-	 */
-	public static String millisToHHMM(long millis){
-		
-		Date d = new Date(millis);
-		Calendar c = new GregorianCalendar();
-		c.setTime(d);
-		int mm = c.get(Calendar.MINUTE);
-		int hh =c.get(Calendar.HOUR_OF_DAY);
-		
-		return String.format("%02d:%02d",hh,mm);
-	}
+
 	
 	@Override
 	public void stop() throws Exception {
