@@ -108,6 +108,6 @@ public class ChartVO {
 			
 		}
 
-		return percents;
+		return -percents;
 	}
 }

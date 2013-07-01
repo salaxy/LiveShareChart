@@ -67,7 +67,9 @@ public class Worker extends Thread {
 		this.stockUpdateQueue = this.getStockIds();
 		
 		while (!this.isInterrupted()) {
+			System.out.println("Worker: Waking up.");
 			this.processQueue();
+			System.out.println("Worker: Sleeping.");
 			
 			synchronized (this) {
 				try {
@@ -142,7 +144,8 @@ public class Worker extends Thread {
 	 * 
 	 */
 	private void updateStock(int id, long timestamp) {
-		List<Map<String, AttributeValue>> updatedStockDataList = this.ddbClient.getAllItems(id, timestamp);
+		List<Map<String, AttributeValue>> updatedStockDataList = this.ddbClient.getAllItems(id, timestamp, System.currentTimeMillis());
+		System.out.println("Worker: ID " + id + " has " + updatedStockDataList.size() + " new items to process.");
 		this.updateStockChartData(updatedStockDataList);
 	}
 	
@@ -190,6 +193,7 @@ public class Worker extends Thread {
 					ChartVO chart = model.returnChartById(id);
 
 					if (chart != null) {
+						System.out.println("Worker: Async calling model for updating " + id + " whith new stock value " + stockValue + " from time " + this.model.millisToHHMM(Long.parseLong(timeStamp)));
 						updateModelAsync(chart, this.model.millisToHHMM(Long.parseLong(timeStamp)), stockValue);
 					}
 					else {
@@ -200,6 +204,7 @@ public class Worker extends Thread {
 						
 						chart = new ChartVO(id, stockName);
 						model.addToChartList(chart);
+						System.out.println("Worker: Async calling model for creating " + id + " whith new stock value " + stockValue + " from time " + this.model.millisToHHMM(Long.parseLong(timeStamp)));
 						updateModelAsync(chart, this.model.millisToHHMM(Long.parseLong(timeStamp)), stockValue);
 					}
 				}
@@ -224,6 +229,7 @@ public class Worker extends Thread {
 		Platform.runLater(new Runnable() {
 			 @Override
 			 public void run() {
+				 System.out.println("Zeit: " + timeStamp + " Aktie: " + chart.getName() + " Kurs: " + stockValue);
 				 chart.getChart().getData().add(new XYChart.Data<String, Number>(timeStamp, stockValue));
 				 model.updateTicker();
 			 }
@@ -246,6 +252,8 @@ public class Worker extends Thread {
 			nextUpdateTime = stock.getValue();
 			
 			if (nextUpdateTime < currentTime) {
+				System.out.println("Worker: Update of ID " + stock.getKey() + " nescessary.");
+				
 				this.updateStock(stock.getKey(), nextUpdateTime);
 				
 				nextUpdateTime = currentTime + ((id == this.priorityStock) ? Worker.FAST_UPDATE_DELAY : Worker.SLOW_UPDATE_RATE);
