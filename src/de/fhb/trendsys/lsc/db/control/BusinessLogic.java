@@ -1,7 +1,7 @@
 package de.fhb.trendsys.lsc.db.control;
 
 import de.fhb.trendsys.lsc.model.ChartVO;
-import de.fhb.trendsys.lsc.model.NewAdvancedAndFancyAppModel;
+import de.fhb.trendsys.lsc.model.AppModel;
 
 
 /**
@@ -14,7 +14,7 @@ import de.fhb.trendsys.lsc.model.NewAdvancedAndFancyAppModel;
  */
 public class BusinessLogic {
 
-	private NewAdvancedAndFancyAppModel model;
+	private AppModel model;
 	Worker updateWorker;
 
 	/**
@@ -22,16 +22,23 @@ public class BusinessLogic {
 	 * Sie startet dabei auch einen {@link Worker}-Thread, der regelmäßig das Model aktialisiert.
 	 * @param model Model
 	 */
-	public BusinessLogic(NewAdvancedAndFancyAppModel model) {
+	public BusinessLogic(AppModel model) {
 		updateWorker = Worker.getInstance(model);
 		this.model=model;
+		
+		while (updateWorker.getState() != Thread.State.TIMED_WAITING) {
+			try {
+				Thread.sleep(50);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	/**
 	 * Informiert den {@link Worker}-Thread, jetzt zu überprüfen, ob er zu arbeiten hat.
 	 */
 	public void refresh(){
-		System.out.println("refresh in Businesslogic");
 		updateWorker = Worker.getInstance(model);
 		synchronized (updateWorker) {
 			updateWorker.notify();

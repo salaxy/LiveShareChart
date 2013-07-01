@@ -21,7 +21,6 @@ import javafx.scene.Scene;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart.Data;
 import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
@@ -39,9 +38,10 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextBuilder;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+
 import de.fhb.trendsys.lsc.db.control.BusinessLogic;
 import de.fhb.trendsys.lsc.model.ChartVO;
-import de.fhb.trendsys.lsc.model.NewAdvancedAndFancyAppModel;
+import de.fhb.trendsys.lsc.model.AppModel;
 import de.fhb.trendsys.lsc.model.NewsVO;
 
 /**
@@ -53,7 +53,7 @@ import de.fhb.trendsys.lsc.model.NewsVO;
 public class StockChartGUI extends Application {
 
 	private BusinessLogic logic;
-	private NewAdvancedAndFancyAppModel model;
+	private AppModel model;
 
 	private CategoryAxis xAxis;
 	private NumberAxis yAxis;
@@ -68,12 +68,12 @@ public class StockChartGUI extends Application {
 	private ChoiceBox<String> choiceBox;
 	private FlowPane tickerFlow;
 	private TilePane stockNewsPane;
-	private Button bigRedButton;
+	private Button updateButton;
 	
 
 	@Override
 	public void start(Stage stage) throws Exception {
-		model = new NewAdvancedAndFancyAppModel();
+		model = new AppModel(this);
 		logic = new BusinessLogic(model);
 		this.initComponents(stage);
 		stage.show();
@@ -138,17 +138,17 @@ public class StockChartGUI extends Application {
 		newsTicker.toFront();
 		root.getChildren().add(newsTicker);
 
-		bigRedButton= createBigRedButton();
-		chartTabGroup.getChildren().add(bigRedButton);
+		updateButton= createUpdateButton();
+		chartTabGroup.getChildren().add(updateButton);
 		
-		System.out.println("Refreshing GUI...");	
 		logic.refresh();
-		System.out.println("Refresh finished.");
+		model.updateChartNames();
+		model.updateTicker();
 	}
 
-	protected Button createBigRedButton() {
+	protected Button createUpdateButton() {
 		final Button button;
-		button = new Button("Do not Push the RED-Button!");
+		button = new Button("Manual Update");
 		button.setStyle("-fx-base: red;");
 		button.setLayoutX(500);
 		button.setLayoutY(15);
@@ -156,10 +156,10 @@ public class StockChartGUI extends Application {
 		button.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				button.setText("clicked and BÄMMMMMMMMM!!!!");
-				
-				model.initTestData();
-				refreshTicker();
+				//model.initTestData();
+				logic.refresh();
+				model.updateChartNames();
+				refreshTicker();				
 			}
 
 		});
@@ -169,7 +169,7 @@ public class StockChartGUI extends Application {
 	/**
 	 * refresh des Tickerbandes
 	 */
-	protected void refreshTicker(){
+	public void refreshTicker(){
 		List<Node> hyperlinks= new ArrayList<Node>();
 		addNewsToTicker(hyperlinks);
 		addStockPercentagesToTickerNodes(hyperlinks);
@@ -203,7 +203,7 @@ public class StockChartGUI extends Application {
 				Hyperlink actualLink = HyperlinkBuilder.create()
 				.textFill(Color.BLACK)
 				.font(Font.font("Verdana", FontWeight.BOLD, 10))
-				.text(feed.getTitle())
+				.text(this.model.millisToHHMM(feed.getTime().getTime()) + " Uhr  " + feed.getTitle())
 				.tooltip(new Tooltip(feed.getUrl()))
 				.build();
 				
@@ -300,7 +300,6 @@ public class StockChartGUI extends Application {
 			actualLink.setOnAction(new EventHandler<ActionEvent>() {
 	            @Override
 	            public void handle(ActionEvent e) {
-	            	System.out.println("This link is clicked: " + feed.getUrl());
 	            	tabPane.getSelectionModel().select(webTab);
 	            	webContainer.webEngine.load(feed.getUrl());
 	            }
@@ -308,11 +307,17 @@ public class StockChartGUI extends Application {
 			
 			hyperlinks.add(TextBuilder
 					.create()
-					.text("  +++++  ")
+					.text(" + ")
 					.translateY(3)
 					.fill(Color.WHITE).build());
 			
 			hyperlinks.add(actualLink);
+			
+			hyperlinks.add(TextBuilder
+					.create()
+					.text(" + ")
+					.translateY(3)
+					.fill(Color.WHITE).build());
 		}
 	}
 
@@ -323,57 +328,66 @@ public class StockChartGUI extends Application {
 	private void addStockPercentagesToTickerNodes(List<Node> hyperlinks) {
 		for(ChartVO currentChart: this.model.getChartList()){
 			
-			ObservableList<Data<String, Number>> currentSeries = currentChart.getChart().getData();
 			String seriesName=currentChart.getName();
-		
-			//TODO evtl. Berechnung in BusinessLogic
-			double stockDayDiff= currentSeries.get(0).getYValue().doubleValue()-currentSeries.get(currentSeries.size()-1).getYValue().doubleValue();
-			double percentageDiff= 0d;
 			
-			if(stockDayDiff!=0d){
-				percentageDiff=stockDayDiff/currentSeries.get(0).getYValue().doubleValue();	
-			}
-			percentageDiff=-percentageDiff;
-			
+			double stockDayDiff = currentChart.getChangeInPercents();
 			hyperlinks.add(TextBuilder
 					.create()
-					.text("  +++++  ")
+					.text(" * ")
 					.translateY(3)
 					.fill(Color.WHITE).build());
 			
-			if(stockDayDiff>=0d){
+			hyperlinks.add(TextBuilder
+					.create()
+					.text(seriesName + " ")
+					.font(Font.font("Verdana", FontWeight.BOLD, 12))
+					.translateY(3)
+					.fill(Color.WHITE).build());
+			
+			if(stockDayDiff >= 0.01d){
 				hyperlinks.add(TextBuilder
 						.create()
-						.text("  "+ seriesName + " " + String.format(" %.2f", percentageDiff) + "%")
+						.text(String.format("+%.2f", stockDayDiff) + "%")
 						.font(Font.font("Verdana", FontWeight.BOLD, 12))
 						.translateY(3)
-						.fill(Color.DARKRED).build());
-			}else{
-				hyperlinks.add(TextBuilder
-						.create()
-						.text("  "+ seriesName + " " + String.format("+ %.2f", percentageDiff) + "%")
-						.font(Font.font("Verdana", FontWeight.BOLD, 12))
-						.translateY(3)
-						.fill(Color.DARKGREEN).build());	
+						.fill(Color.LIGHTGREEN).build());
 			}
+			else if (stockDayDiff < 0d){
+				hyperlinks.add(TextBuilder
+						.create()
+						.text(String.format("%.2f", stockDayDiff) + "%")
+						.font(Font.font("Verdana", FontWeight.BOLD, 12))
+						.translateY(3)
+						.fill(Color.RED).build());	
+			}
+			else {
+				hyperlinks.add(TextBuilder
+						.create()
+						.text(String.format("+/-%.2f", stockDayDiff) + "%")
+						.font(Font.font("Verdana", FontWeight.BOLD, 12))
+						.translateY(3)
+						.fill(Color.YELLOW).build());
+			}
+			
+			hyperlinks.add(TextBuilder
+					.create()
+					.text(" * ")
+					.translateY(3)
+					.fill(Color.WHITE).build());
 		}
 	}
 
 	protected ChoiceBox<String> createChoiceBox() {
-
-		choiceBox = new ChoiceBox<String>(this.model.getChartNamesList());
-		
+		ObservableList<String> chartNamesList = this.model.getChartNamesList();
+		choiceBox = new ChoiceBox<String>(chartNamesList);
 		choiceBox.getSelectionModel().selectFirst();
 		choiceBox.valueProperty().addListener(new ChangeListener<String>() {
-
+			
 			@Override
-			public void changed(final ObservableValue<? extends String> arg0,
-					final String arg1, final String name) {
-
-				System.out.println("ChoiceBox: " + name);
-				logic.refreshByName(name);
-				refreshChart(name);
-				refreshStockNewsPane(name);
+			public void changed(final ObservableValue<? extends String> observable, final String oldValue, final String newValue) {
+				logic.refreshByName(newValue);
+				refreshChart(newValue);
+				refreshStockNewsPane(newValue);
 			}
 		});
 
@@ -384,8 +398,8 @@ public class StockChartGUI extends Application {
 	 * @param name
 	 */
 	private void refreshChart(final String name) {
-		Series<String, Number> series=model.getCurrentChartByName(name);
-		if(series!=null){
+		Series<String, Number> series = model.getCurrentChartByName(name);
+		if(series != null){
 			lineChart.getData().clear();
 			lineChart.getData().setAll(series);					
 			lineChart.setTitle(series.getName());	

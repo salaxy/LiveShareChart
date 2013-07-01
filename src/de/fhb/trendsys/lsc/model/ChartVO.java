@@ -104,10 +104,10 @@ public class ChartVO {
 			double latestValue = dataList.get(dataList.size() - 1).getYValue().doubleValue();
 			
 			if (oldestValue > 0d && latestValue > 0d)
-				percents = (latestValue - oldestValue) / oldestValue;
+				percents = (oldestValue - latestValue) / oldestValue;
 			
 		}
-		
+
 		return percents;
 	}
 }

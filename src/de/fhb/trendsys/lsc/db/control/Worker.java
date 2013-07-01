@@ -8,13 +8,14 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import javafx.scene.chart.XYChart;
+import javafx.application.Platform;
 
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 
 import de.fhb.trendsys.amazonfunctions.dynamodb.DynamoDBHandler;
 import de.fhb.trendsys.lsc.model.ChartVO;
-import de.fhb.trendsys.lsc.model.NewAdvancedAndFancyAppModel;
+import de.fhb.trendsys.lsc.model.AppModel;
 import de.fhb.trendsys.lsc.model.NewsVO;
 
 /**
@@ -27,10 +28,10 @@ import de.fhb.trendsys.lsc.model.NewsVO;
 public class Worker extends Thread {
 	private static Worker instance;
 	private static final long FAST_UPDATE_DELAY = 60000; // 1 Min.
-	private static final long SLOW_UPDATE_RATE = FAST_UPDATE_DELAY * 10;
+	private static final long SLOW_UPDATE_RATE = FAST_UPDATE_DELAY * 10L;
 	
 	private DynamoDBHandler ddbClient;
-	private NewAdvancedAndFancyAppModel model;
+	private AppModel model;
 	private Map<Integer, Long> stockUpdateQueue;
 	private int priorityStock = 0;
 	
@@ -40,7 +41,7 @@ public class Worker extends Thread {
 	 * @param model Referenz auf das Appmodel, um dort Daten aktualisieren zu können.
 	 * @return Instanz des Threads
 	 */
-	public static Worker getInstance(NewAdvancedAndFancyAppModel model) {
+	public static Worker getInstance(AppModel model) {
 		if (Worker.instance == null || Worker.instance.isAlive() == false || Worker.interrupted() == true) {
 			Worker.instance = new Worker(model);
 			Worker.instance.start();
@@ -56,7 +57,7 @@ public class Worker extends Thread {
 	 * @param model
 	 * @see Worker#getInstance(AppModel)
 	 */
-	private Worker(NewAdvancedAndFancyAppModel model) {
+	private Worker(AppModel model) {
 		this.model = model;
 		this.stockUpdateQueue = new HashMap<Integer, Long>();
 		this.ddbClient = new DynamoDBHandler(Regions.EU_WEST_1, "stockdata");
@@ -107,6 +108,23 @@ public class Worker extends Thread {
 		return returnMap;
 	}
 	
+	private String getStockName(int id) {
+		List<Map<String, AttributeValue>> resultList = this.ddbClient.getAllItems(id, 0L, 0L);
+		String returnString = null;
+		
+		for (Map<String, AttributeValue> resultMap : resultList) {
+			Set<Entry<String, AttributeValue>> resultSet = resultMap.entrySet();
+			
+			for (Entry<String, AttributeValue> item : resultSet) {
+				if (item.getKey().equals("stockname")) {
+					returnString = item.getValue().getS();
+				}
+			}
+		}
+		
+		return returnString;
+	}
+	
 	/**
 	 * Fragt alle Tupel einer Aktie ab, die seit dem angegeben Zeitstempel in die Datenbank geschrieben wurden.
 	 * Es wird auch das {@link AppModel} aktualisiert.
@@ -131,19 +149,27 @@ public class Worker extends Thread {
 	 * 
 	 */
 	private void updateStockChartData(List<Map<String, AttributeValue>> updatedStockDataList) {
+		String stockName = null;
+		int id = 0;
+		String timeStamp = null;
+		double stockValue = 0d;
+		String newsTitle = null;
+		String newsDescription = null;
+		String newsUrl = null;
+		
 		if (this.model != null) {
 			for (Map<String, AttributeValue> stockMap : updatedStockDataList) {
 				Set<Entry<String, AttributeValue>>  stockSet = stockMap.entrySet();
 				
-				int id = 0;
-				String timeStamp = null;
-				double stockValue = 0d;
-				String newsTitle = null;
-				String newsDescription = null;
-				String newsUrl = null;
+				stockName = null;
+				id = 0;
+				timeStamp = null;
+				stockValue = 0d;
+				newsTitle = null;
+				newsDescription = null;
+				newsUrl = null;
 				
 				for (Entry<String, AttributeValue> item : stockSet) {
-					System.out.println("Entry: " + item);
 					String type = item.getKey();
 					
 					if (type.equals("id")) id = Integer.parseInt(item.getValue().getN());
@@ -156,17 +182,19 @@ public class Worker extends Thread {
 				
 				if (id > 0 && !timeStamp.isEmpty()) {
 					ChartVO chart = model.returnChartById(id);
-					System.out.println("chart id:" + id);
+
 					if (chart != null) {
-						chart.getChart().getData().add(new XYChart.Data<String, Number>(timeStamp, stockValue));
-						System.out.println("timestamp: " + timeStamp + "  stock value: " + stockValue);
+						updateModelAsync(chart, timeStamp, stockValue);
 					}
 					else {
-						chart = new ChartVO(id, "no name");
-						chart.getChart().getData().add(new XYChart.Data<String, Number>(timeStamp, stockValue));
-						System.out.println("Adding chart " + chart.getId());
+						if (stockName == null)
+							stockName = getStockName(id);
+						if (stockName == null)
+							stockName = "unknown stock";
+						
+						chart = new ChartVO(id, stockName);
 						model.addToChartList(chart);
-						System.out.println("new chart item: " + chart.getChart());
+						updateModelAsync(chart, timeStamp, stockValue);
 					}
 				}
 				
@@ -174,10 +202,19 @@ public class Worker extends Thread {
 					NewsVO news = new NewsVO(newsTitle, newsDescription, newsUrl, new Date(Long.parseLong(timeStamp)));
 					ChartVO chart = model.returnChartById(id);
 					chart.getNewsFeeds().add(news);
-					System.out.println("new news item: " + news);
 				}
 			}
 		}
+	}
+	
+	private void updateModelAsync(final ChartVO chart, final String timeStamp, final double stockValue) {
+		Platform.runLater(new Runnable() {
+			 @Override
+			 public void run() {
+				 chart.getChart().getData().add(new XYChart.Data<String, Number>(timeStamp, stockValue));
+				 model.updateTicker();
+			 }
+		 });
 	}
 	
 	/**
@@ -220,9 +257,8 @@ public class Worker extends Thread {
 		for (Entry<Integer, Long> stock : stockSet) {
 			stockId = stock.getKey();
 			
-			if (stockId == this.priorityStock) {
+			if (stockId == this.priorityStock)
 				stock.setValue(System.currentTimeMillis());
-			}
 		}
 	}
 }

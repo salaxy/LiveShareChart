@@ -17,16 +17,33 @@ import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 
 import de.fhb.trendsys.amazonfunctions.dynamodb.DynamoDBHandler;
 
-public class Grabber {
+public class Grabber extends Thread {
 	public static final long delayChartUpdate = 60000L; // 1 Min.
+	private DynamoDBHandler ddbClient;
+	private int id;
+	private URL rssURL;
+	private String stockUrl;
 
 	public static void main(String[] args) throws MalformedURLException {
-		DynamoDBHandler ddbClient = new DynamoDBHandler(Regions.EU_WEST_1, "stockdata");
+		// Sony
+		new Grabber(new DynamoDBHandler(Regions.EU_WEST_1, "stockdata"), 1, new URL("http://www.sony.de/rss/de_DE/All.rss"), "http://www.sony.net").start();
 		
+		// Nintendo
+		new Grabber(new DynamoDBHandler(Regions.EU_WEST_1, "stockdata"), 2, new URL("http://www.nintendolife.com/feeds/news"), "http://www.nintendo.com").start();
+
+		// Software AG
+		new Grabber(new DynamoDBHandler(Regions.EU_WEST_1, "stockdata"), 3, new URL("http://www.softwareag.com/blog/reality_check/index.php/feed/"), "http://www.softwareag.com").start();
+	}
+	
+	public Grabber(DynamoDBHandler ddbClient, int id, URL rssURL, String stockUrl) throws MalformedURLException {
+		this.ddbClient = new DynamoDBHandler(Regions.EU_WEST_1, "stockdata");
+		this.id = id;
+		this.rssURL = rssURL;
+		this.stockUrl = stockUrl;
+	}
+	
+	public void run() {
 		String lastNewsTitle = "";
-		long id = 1;
-		URL rssUrl = new URL("http://www.sony.de/rss/de_DE/All.rss");
-		String stockUrl = "http://www.sony.net";
 		
 		while (true) {
 			Long currentTime = System.currentTimeMillis();
@@ -38,7 +55,7 @@ public class Grabber {
 			stockDataItem.put("stock", new AttributeValue().withS(Double.toString(Math.random())));			
 			
 			// News-Feed abholen			
-			Document feedXml = new Request(rssUrl).getResponse().getXML();
+			Document feedXml = new Request(rssURL).getResponse().getXML();
 			Feed[] feeds = new Parser(feedXml).getFeeds();
 			
 			if (!feeds[0].getItems()[0].getTitle().equals(lastNewsTitle)) {
@@ -65,7 +82,7 @@ public class Grabber {
 				lastNewsTitle = feedTitle;
 			}
 
-			ddbClient.addItem(1, stockDataItem);
+			ddbClient.addItem(id, stockDataItem);
 			
 			System.out.println("Item: " + stockDataItem.toString());
 			System.out.println("Last news title: " + lastNewsTitle);

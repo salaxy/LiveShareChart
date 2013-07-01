@@ -1,5 +1,6 @@
 package de.fhb.trendsys.amazonfunctions.dynamodb;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -7,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.ClasspathPropertiesFileCredentialsProvider;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
@@ -33,6 +35,7 @@ import com.amazonaws.services.dynamodbv2.model.UpdateItemRequest;
  */
 public class DynamoDBHandler {
 	private AmazonDynamoDBClient ddbClient;
+	private Regions region;
 	private String selectedTable;
 	
 	/**
@@ -45,12 +48,21 @@ public class DynamoDBHandler {
 	 * @see DynamoDBHandler#getTableStatus()
 	 */
 	public DynamoDBHandler(Regions region, String tableName) {
+		this.region = region;
+		selectTable(tableName);	
+		initDynamoDB();
+	}
+	
+	private void initDynamoDB() {
+		if (ddbClient != null)
+			ddbClient.shutdown();
+		
 		ddbClient = new AmazonDynamoDBClient(new ClasspathPropertiesFileCredentialsProvider());
-				
+		ddbClient.setConfiguration(new ClientConfiguration().withConnectionTimeout(120000)); // 2 Min.
+		
 		Region currentRegion = Region.getRegion(region);
 		ddbClient.setRegion(currentRegion);		
 		
-		selectTable(tableName);
 	}
 	
 	/**
@@ -75,6 +87,7 @@ public class DynamoDBHandler {
 	 * @see DynamoDBHandler#updateItem(int, Map)
 	 */
 	public Map<String, AttributeValue> getItem(int id) {
+		initDynamoDB();
 		Map<String, AttributeValue> key = constructNewItem(id);
 		GetItemRequest request = new GetItemRequest()
 									 .withTableName(selectedTable)
@@ -98,10 +111,21 @@ public class DynamoDBHandler {
 	/**
 	 * Fragt alle Tupel ab, die dieselbe ID haben und deren Erstelldatum nicht vor dem angegeben Zeitstempel liegen.
 	 * @param id Primärschlüssel der Tupel
-	 * @param timestamp Ältester Zeitpunkt eines Tupels 
+	 * @param sinceTimestamp Ältester Zeitpunkt eines Tupels 
 	 * @return Liste aller passenden Tupel
 	 */
-	public List<Map<String, AttributeValue>> getAllItems(int id, long timestamp) {
+	public List<Map<String, AttributeValue>> getAllItems(int id, long sinceTimestamp) {
+		return getAllItems(id, sinceTimestamp, System.currentTimeMillis());
+	}
+	
+	/**
+	 * Fragt alle Tupel ab, die dieselbe ID haben und deren Erstelldatum innerhalb des angegeben Zeitstempels liegen.
+	 * @param id Primärschlüssel der Tupel
+	 * @param fromTimestamp Ältester Zeitpunkt eines Tupels
+	 * @param toTimestamp Jüngster Zeitpunkt eines Tupels 
+	 * @return Liste aller passenden Tupel
+	 */
+	public List<Map<String, AttributeValue>> getAllItems(int id, long fromTimestamp, long toTimestamp) {
 		Map<String, Condition> keyConditions = new HashMap<String, Condition>();
 		
 		Condition primaryKeyCondition = new Condition()
@@ -111,9 +135,10 @@ public class DynamoDBHandler {
 		keyConditions.put("id", primaryKeyCondition);
 		
 		Condition rangeCondition = new Condition()
-									   .withComparisonOperator(ComparisonOperator.GE)
-									   .withAttributeValueList(new AttributeValue()
-									   							   .withS(Long.toString(timestamp)));
+									   .withComparisonOperator(ComparisonOperator.BETWEEN)
+									   .withAttributeValueList(Arrays.asList(new AttributeValue().withS(Long.toString(fromTimestamp)),
+											   								 new AttributeValue().withS(Long.toString(toTimestamp))));
+		
 		keyConditions.put("timestamp", rangeCondition);
 		
 		QueryRequest request = new QueryRequest()
@@ -134,7 +159,7 @@ public class DynamoDBHandler {
 	 * @see DynamoDBHandler#updateItem(int, Map)
 	 */
     public void deleteItem(int id) {
-    	Map<String, AttributeValue> key = constructNewItem(id);
+		Map<String, AttributeValue> key = constructNewItem(id);
 		DeleteItemRequest request = new DeleteItemRequest()
         								.withTableName(this.selectedTable)
         								.withKey(key);
@@ -199,7 +224,7 @@ public class DynamoDBHandler {
 	 * @see DynamoDBHandler#constructUpdateContentItem(Map)
      */
     public void updateItem(int id, Map<String, AttributeValue> content) {
-    	Map<String, AttributeValue> key = constructNewItem(id);
+		Map<String, AttributeValue> key = constructNewItem(id);
     	Map<String, AttributeValueUpdate> value = constructUpdateContentItem(content);
 
         UpdateItemRequest request = new UpdateItemRequest()

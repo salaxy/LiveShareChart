@@ -5,6 +5,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import de.fhb.trendsys.lsc.gui.StockChartGUI;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.chart.XYChart;
@@ -16,37 +18,47 @@ import javafx.scene.chart.XYChart.Series;
  * @author Andy Klay <klay@fh-brandenburg.de>
  * @author Frank Mertens
  */
-public class NewAdvancedAndFancyAppModel {
+public class AppModel {
 	
+	private StockChartGUI gui;
 	private ArrayList<ChartVO> availableChartVO;
 	private ArrayList<String> availableChartNames;
 	private ObservableList<String> observableChartNames;
-
-	/**
-	 * updated die ObservableList zu den Cahrt-Names
-	 */
-	public void updateChartNames(){
-		observableChartNames.clear();
-		
-		for(ChartVO currentChart : availableChartVO){
-			System.out.println("Chartname: "+currentChart.getName());
-			observableChartNames.add(currentChart.getName());
-		}
-	}
+	
 	/**
 	 * Standard-Konstruktor mit DummyVO
 	 */
-	public NewAdvancedAndFancyAppModel() {
+	public AppModel(StockChartGUI gui) {
+		this.gui = gui;
 		availableChartVO = new ArrayList<ChartVO>();
 		availableChartNames = new ArrayList<String>();
 		observableChartNames = FXCollections.<String>observableList(availableChartNames);
 
 		//dummy nicht rausnehmen, erstmal benötigt, sonst exception in der GUI
-		createDummyChartVO();	
+		// Edit von Frank: jetzt nicht mehr ;)
+		//createDummyChartVO();	
+	}
+
+	public void updateTicker() {
+		if (gui != null)
+			gui.refreshTicker();
 	}
 
 	/**
-	 * erstellt einen Dummy für einen ChartVO-Eintrag
+	 * Updated die ObservableList zu den Chart-Names
+	 */
+	public void updateChartNames(){
+		if (observableChartNames != null) {
+			observableChartNames.clear();
+		
+			for(ChartVO currentChart : availableChartVO){
+				observableChartNames.add(currentChart.getName());
+			}
+		}
+	}
+	
+	/**
+	 * Erstellt einen Dummy für einen ChartVO-Eintrag
 	 */
 	private void createDummyChartVO() {
 		XYChart.Series<String, Number> dummyChart= new XYChart.Series<String, Number>();
@@ -142,7 +154,6 @@ public class NewAdvancedAndFancyAppModel {
 	public Series<String,Number> getCurrentChartByName(String name) {
 		for (ChartVO chart : availableChartVO) {
 			if (name!=null&&chart.getName().equals(name)){
-				System.out.println("im Model: "+ chart.getName() + " ausgewählt");
 				return chart.getChart();	
 			}
 		}
@@ -235,7 +246,7 @@ public class NewAdvancedAndFancyAppModel {
 	 * @param millis
 	 * @return Zeit "hh:mm"
 	 */
-	private String millisToHHMM(long millis){
+	public String millisToHHMM(long millis){
 		
 		Date d = new Date(millis);
 		Calendar c = new GregorianCalendar();
