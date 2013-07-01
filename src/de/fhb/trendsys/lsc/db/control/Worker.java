@@ -184,7 +184,7 @@ public class Worker extends Thread {
 					ChartVO chart = model.returnChartById(id);
 
 					if (chart != null) {
-						updateModelAsync(chart, timeStamp, stockValue);
+						updateModelAsync(chart, this.model.millisToHHMM(Long.parseLong(timeStamp)), stockValue);
 					}
 					else {
 						if (stockName == null)
@@ -194,7 +194,7 @@ public class Worker extends Thread {
 						
 						chart = new ChartVO(id, stockName);
 						model.addToChartList(chart);
-						updateModelAsync(chart, timeStamp, stockValue);
+						updateModelAsync(chart, this.model.millisToHHMM(Long.parseLong(timeStamp)), stockValue);
 					}
 				}
 				
