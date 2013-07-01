@@ -17,8 +17,14 @@ import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 
 import de.fhb.trendsys.amazonfunctions.dynamodb.DynamoDBHandler;
 
+/**
+ * Diese Klasse erstellt mehrer Thread, die kontinuierlich Daten in die Datenbank speichern.
+ 
+ * @author Frank
+ *
+ */
 public class Grabber extends Thread {
-	public static final long delayChartUpdate = 5000L; // 10 Sek.
+	public static final long delayChartUpdate = 60000L; // 1 Min.
 	private DynamoDBHandler ddbClient;
 	private int id;
 	private URL rssURL;
@@ -35,8 +41,18 @@ public class Grabber extends Thread {
 		new Grabber(new DynamoDBHandler(Regions.EU_WEST_1, "stockdata"), 3, new URL("http://www.softwareag.com/blog/reality_check/index.php/feed/"), "http://www.softwareag.com").start();
 	}
 	
+	/**
+	 * Erzeugt einen thread, der kontinuierlich in der Datenbank Kursdaten zu der angegeben Aktie generiert.
+	 * Weiterhin wird bei jedem Update überprüft, ob neue RSS-News vorliegen. Ist der Link zu einer RSS-News
+	 * nicht verfügbar, wird ein Link zur Hauptseite der Firma stattdessen eingefügt.
+	 * @param DynamoDBHandler
+	 * @param Aktien-ID
+	 * @param RSS-URL
+	 * @param Link zur Hauptseite
+	 * @throws MalformedURLException
+	 */
 	public Grabber(DynamoDBHandler ddbClient, int id, URL rssURL, String stockUrl) throws MalformedURLException {
-		this.ddbClient = new DynamoDBHandler(Regions.EU_WEST_1, "stockdata");
+		this.ddbClient = ddbClient;
 		this.id = id;
 		this.rssURL = rssURL;
 		this.stockUrl = stockUrl;

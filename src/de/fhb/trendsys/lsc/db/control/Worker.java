@@ -108,6 +108,12 @@ public class Worker extends Thread {
 		return returnMap;
 	}
 	
+	/**
+	 * Gibt den Firmennamen zu einer ID aus.
+	 * Darf nicht mit der ID = 0 verwendet werden.
+	 * @param id - Aktie
+	 * @return Firmenname
+	 */
 	private String getStockName(int id) {
 		List<Map<String, AttributeValue>> resultList = this.ddbClient.getAllItems(id, 0L, 0L);
 		String returnString = null;
@@ -207,6 +213,13 @@ public class Worker extends Thread {
 		}
 	}
 	
+	/**
+	 * Startet einen Thread, in dem direkt das Model und indirekt das ViewModel aktualisiert wird. Das ist nötig,
+	 * weil das ViewModel im JavaFX-Thread läuft und der normale Zugriff von Außen zu Fehlern führen würde.
+	 * @param chart VO-Objekt, das aktualisiert werden soll
+	 * @param timeStamp Zeitstempel der Aktualisierung
+	 * @param stockValue Kurs zu der gegeben Zeit
+	 */
 	private void updateModelAsync(final ChartVO chart, final String timeStamp, final double stockValue) {
 		Platform.runLater(new Runnable() {
 			 @Override

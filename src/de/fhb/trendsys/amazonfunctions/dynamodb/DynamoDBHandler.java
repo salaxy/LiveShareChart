@@ -53,6 +53,10 @@ public class DynamoDBHandler {
 		initDynamoDB();
 	}
 	
+	/**
+	 * Initialisiert die Verbindung zur Amazon DynamoDB über das AWS-SDK und stellt alles nötige ein.
+	 * Der Verbindungs-Timeout wird auf 2 Minuten gesetzt.
+	 */
 	private void initDynamoDB() {
 		if (ddbClient != null)
 			ddbClient.shutdown();

@@ -38,14 +38,19 @@ public class AppModel {
 		// Edit von Frank: jetzt nicht mehr ;)
 		//createDummyChartVO();	
 	}
-
+	
+	/**
+	 * Ruft die GUI auf, den Newsticker zu aktualisieren.
+	 * 
+	 * @see StockChartGUI#refreshTicker()
+	 */
 	public void updateTicker() {
 		if (gui != null)
 			gui.refreshTicker();
 	}
 
 	/**
-	 * Updated die ObservableList zu den Chart-Names
+	 * Aktualisiert das ViewModel der Aktienkursverläufe.
 	 */
 	public void updateChartNames(){
 		if (observableChartNames != null) {
@@ -58,7 +63,10 @@ public class AppModel {
 	}
 	
 	/**
-	 * Erstellt einen Dummy für einen ChartVO-Eintrag
+	 * Erstellt einen Dummy für einen ChartVO-Eintrag.
+	 * Diese Methode ist zu Testzwecken vorhanden.
+	 * 
+	 * @see #initTestData()
 	 */
 	private void createDummyChartVO() {
 		XYChart.Series<String, Number> dummyChart= new XYChart.Series<String, Number>();
@@ -76,6 +84,7 @@ public class AppModel {
 		availableChartNames.add("dummy");
 		availableChartVO.add(dummyVO);
 		
+		updateTicker();
 	}
 	
 	/**
@@ -86,8 +95,9 @@ public class AppModel {
 	}
 
 	/**
-	 * fügt einen ChartVO hinzu zur ChartVO ArrayList
-	 * @param chart
+	 * Fügt eine Aktie zu einer ArrayList aller verfügbaren Aktien hinzu.
+	 * Helfermethode
+	 * @param neue Aktie
 	 */
 	public void addToChartList(final ChartVO chart) {
 		this.availableChartVO.add(chart);
@@ -146,10 +156,10 @@ public class AppModel {
 	}
 	
 	/**
-	 * holt die Daten für das Chart anhand des Bezeichners, falls vorhanden
+	 * Ermittelt einen Aktienkurs anhand ihres Firmennamens.
 	 * Wird keine gefunden, wird null zurückgegeben.
-	 * @param name
-	 * @return 
+	 * @param Firmenname
+	 * @return Aktienkurs
 	 */
 	public Series<String,Number> getCurrentChartByName(String name) {
 		for (ChartVO chart : availableChartVO) {
@@ -175,7 +185,9 @@ public class AppModel {
 	}
 	
 	/**
-	 * initialisiert Test-Daten
+	 * Generiert einge Testdaten zu Debugzwecken.
+	 * 
+	 * @see #createDummyChartVO()
 	 */
 	public void initTestData(){
 		
@@ -242,8 +254,8 @@ public class AppModel {
 	}
 	
 	/**
-	 * wandelt Zeit von millisekunden in einen hh:mm-Formatierten String um
-	 * @param millis
+	 * Wandelt Zeit von Millisekunden in einen hh:mm-formatierten String um.
+	 * @param Millisekunden
 	 * @return Zeit "hh:mm"
 	 */
 	public String millisToHHMM(long millis){

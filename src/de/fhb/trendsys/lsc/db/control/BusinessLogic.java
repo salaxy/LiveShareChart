@@ -70,6 +70,9 @@ public class BusinessLogic {
 		}
 	}
 	
+	/**
+	 * Signalisiert dem Worker, sich zu beenden.
+	 */
 	public void shutdown() {
 		updateWorker = Worker.getInstance(model);
 		updateWorker.interrupt();
