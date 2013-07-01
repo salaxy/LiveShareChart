@@ -73,5 +73,6 @@ public class BusinessLogic {
 	public void shutdown() {
 		updateWorker = Worker.getInstance(model);
 		updateWorker.interrupt();
+		this.refresh();
 	}
 }

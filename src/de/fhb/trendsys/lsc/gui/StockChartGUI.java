@@ -114,7 +114,7 @@ public class StockChartGUI extends Application {
 
 		initTabs(root);		
 		
-		webContainer = new NewsContentPane(600, 950);
+		webContainer = new NewsContentPane(590, 950);
 		webTabGroup.getChildren().add(webContainer);
 
 		LineChart<String, Number> chart = createChart();
