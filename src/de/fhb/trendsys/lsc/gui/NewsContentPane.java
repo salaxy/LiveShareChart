@@ -7,32 +7,49 @@ import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 
 /**
- * GUI-Klasse zur einbettung eines browser-Fensters
- * 
+ * GUI-Klasse zur Einbettung von Web Content
+ * @author Andy Klay <klay@fh-brandenburg.de>
  */
 public class NewsContentPane extends Region {
 
 	private double myHeight = 300;
 	private double myWidth = 300;
 
-	final WebView newsContentPane = new WebView();
-	final WebEngine webEngine = newsContentPane.getEngine();
+	final private WebView newsContentPane = new WebView();
+	final private WebEngine webEngine = newsContentPane.getEngine();
 
+	/**
+	 * Konstruktor mit default HTML-Content
+	 */
 	public NewsContentPane() {
 		webEngine.loadContent(getHtml("<h1>News-Content-Pane</h1>"));
 		getChildren().add(newsContentPane);
 	}
 
+	/**
+	 * Konstruktor mit default HTML-Content
+	 * und Größen-Angabe
+	 * @param height
+	 * @param width
+	 */
 	public NewsContentPane(double height, double width) {
 		this();
 		myHeight = height;
 		myWidth = width;
 	}
 
+	/**
+	 * gibt die WebView zurück
+	 * @return WebView
+	 */
 	public WebView getWebView() {
 		return newsContentPane;
 	}
 
+	/**
+	 * gibt die WebEngine zurück
+	 * @return WebEngine
+	 */
 	public WebEngine getWebEngine() {
 		return webEngine;
 	}
@@ -53,11 +70,20 @@ public class NewsContentPane extends Region {
 		return myHeight;
 	}
 
+	/**
+	 * setzen der Größe des Elements
+	 * @param height
+	 * @param width
+	 */
 	public void setSize(double height, double width) {
 		myHeight = height;
 		myWidth = width;
 	}
 
+	/**
+	 * laden einer URL
+	 * @param url
+	 */
 	public void loadAnotherUrl(String url) {
 		newsContentPane.getEngine().load(url);
 	}

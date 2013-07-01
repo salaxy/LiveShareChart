@@ -34,8 +34,7 @@ public class AppModel {
 		availableChartNames = new ArrayList<String>();
 		observableChartNames = FXCollections.<String>observableList(availableChartNames);
 
-		//dummy nicht rausnehmen, erstmal benötigt, sonst exception in der GUI
-		// Edit von Frank: jetzt nicht mehr ;)
+		//dummy-daten deaktiviert
 		//createDummyChartVO();	
 	}
 	
@@ -118,7 +117,6 @@ public class AppModel {
 				returnList.add(latestNews);
 			}
 		}
-		
 		return returnList;
 	}
 	

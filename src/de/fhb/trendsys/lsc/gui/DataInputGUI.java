@@ -76,7 +76,7 @@ public class DataInputGUI extends Application {
         
         grabber.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-            	grabber.setText("B‰‰‰‰‰mmm!!!");
+            	grabber.setText("Fertig!!");
                 //TODO grabber
             }
 
@@ -99,6 +99,5 @@ public class DataInputGUI extends Application {
 	public static void main(String[] args) {
 		launch(args);
 	}
-
 
 }
