@@ -18,12 +18,12 @@ import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import de.fhb.trendsys.amazonfunctions.dynamodb.DynamoDBHandler;
 
 public class Grabber extends Thread {
-	public static final long delayChartUpdate = 60000L; // 1 Min.
+	public static final long delayChartUpdate = 5000L; // 10 Sek.
 	private DynamoDBHandler ddbClient;
 	private int id;
 	private URL rssURL;
 	private String stockUrl;
-
+	
 	public static void main(String[] args) throws MalformedURLException {
 		// Sony
 		new Grabber(new DynamoDBHandler(Regions.EU_WEST_1, "stockdata"), 1, new URL("http://www.sony.de/rss/de_DE/All.rss"), "http://www.sony.net").start();
@@ -44,15 +44,19 @@ public class Grabber extends Thread {
 	
 	public void run() {
 		String lastNewsTitle = "";
+		double newValue = 50d;
+		double oldValue = 50d;
 		
 		while (true) {
 			Long currentTime = System.currentTimeMillis();
+			newValue = (oldValue > 60d) ? oldValue - Math.random() * 5d : oldValue + Math.random() * 5d;
 			
 			// DB-Item generieren
 			Map<String, AttributeValue> stockDataItem = new HashMap<String, AttributeValue>();
 			stockDataItem.put("id", new AttributeValue().withN(Long.toString(id)));
 			stockDataItem.put("timestamp", new AttributeValue().withS(Long.toString(currentTime)));
-			stockDataItem.put("stock", new AttributeValue().withS(Double.toString(Math.random())));			
+			stockDataItem.put("stock", new AttributeValue().withS(Double.toString(newValue)));			
+			oldValue = newValue;
 			
 			// News-Feed abholen			
 			Document feedXml = new Request(rssURL).getResponse().getXML();
