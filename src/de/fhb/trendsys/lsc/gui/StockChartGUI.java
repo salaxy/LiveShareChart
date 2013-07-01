@@ -45,8 +45,8 @@ import de.fhb.trendsys.lsc.model.AppModel;
 import de.fhb.trendsys.lsc.model.NewsVO;
 
 /**
- * Mit dieser Klasse wird die JavaFX-Applikation gestartet, Sie beinhaltet
- * GUI-Beschreibung und GUI-Logik
+ * Mit dieser Klasse wird die JavaFX-Applikation gestartet,
+ * Sie beinhaltet GUI-Beschreibung und GUI-Logik
  * 
  * @author Andy Klay <klay@fh-brandenburg.de>
  */
@@ -328,7 +328,7 @@ public class StockChartGUI extends Application {
 	private void addStockPercentagesToTickerNodes(List<Node> hyperlinks) {
 		for(ChartVO currentChart: this.model.getChartList()){
 			
-			String seriesName=currentChart.getName();
+			final String seriesName=currentChart.getName();
 			
 			double stockDayDiff = currentChart.getChangeInPercents();
 			hyperlinks.add(TextBuilder
@@ -337,12 +337,22 @@ public class StockChartGUI extends Application {
 					.translateY(3)
 					.fill(Color.WHITE).build());
 			
-			hyperlinks.add(TextBuilder
-					.create()
-					.text(seriesName + " ")
-					.font(Font.font("Verdana", FontWeight.BOLD, 12))
-					.translateY(3)
-					.fill(Color.WHITE).build());
+			Hyperlink chartLink = HyperlinkBuilder.create()
+			.textFill(Color.WHITE)
+			.font(Font.font("Verdana", FontWeight.BOLD, 10))
+			.text(seriesName)
+			.translateY(3)
+			.tooltip(new Tooltip("Anzeigen von " + seriesName))
+			.build();
+			
+			chartLink.setOnAction(new EventHandler<ActionEvent>() {
+	            @Override
+	            public void handle(ActionEvent e) {
+	            	tabPane.getSelectionModel().select(chartTab);
+	            	choiceBox.getSelectionModel().select(seriesName);
+	            }
+	        });
+			hyperlinks.add(chartLink);
 			
 			if(stockDayDiff >= 0.01d){
 				hyperlinks.add(TextBuilder
@@ -377,6 +387,10 @@ public class StockChartGUI extends Application {
 		}
 	}
 
+	/**
+	 * erzeugt die Choice-Box mit ChangeListener und verknüpften Model (chartNamesList)
+	 * @return neue ChoiceBox<String> ohne gesetzte POstion
+	 */
 	protected ChoiceBox<String> createChoiceBox() {
 		ObservableList<String> chartNamesList = this.model.getChartNamesList();
 		choiceBox = new ChoiceBox<String>(chartNamesList);
@@ -406,12 +420,16 @@ public class StockChartGUI extends Application {
 		}
 	}
 
+	/**
+	 * erzeugt das LineChart mit ChangeListener <<<TODO und verknüpften Model (chartNamesList)
+	 * @return neue ChoiceBox<String> ohne gesetzte POstion
+	 */
 	protected LineChart<String, Number> createChart() {
 
 		xAxis = new CategoryAxis();
 		xAxis.setLabel("Time");
 		yAxis = new NumberAxis();
-		yAxis = new NumberAxis(0, 100, 1);
+//		yAxis = new NumberAxis(0, 100, 1);
 		lineChart=new LineChart<String,Number>(xAxis, yAxis);
 		
 		refreshChart("dummy");
