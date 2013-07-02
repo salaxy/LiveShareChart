@@ -151,6 +151,8 @@ public class StockChartGUI extends Application {
 		logic.refresh();
 		model.updateChartNames();
 		model.updateTicker();
+		
+		choiceBox.getSelectionModel().selectFirst();
 	}
 
 	/**
