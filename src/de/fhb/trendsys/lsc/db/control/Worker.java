@@ -194,7 +194,9 @@ public class Worker extends Thread {
 
 					if (chart != null) {
 						System.out.println("Worker: Async calling model for updating " + id + " whith new stock value " + stockValue + " from time " + this.model.millisToHHMM(Long.parseLong(timeStamp)));
-						updateModelAsync(chart, this.model.millisToHHMM(Long.parseLong(timeStamp)), stockValue);
+						//TODO Problem der Sereis-Daten durcheinader bringt
+//						updateModelAsync(chart, this.model.millisToHHMM(Long.parseLong(timeStamp)), stockValue);
+						updateModelAsync(chart, timeStamp, stockValue); 
 					}
 					else {
 						if (stockName == null)
@@ -205,7 +207,8 @@ public class Worker extends Thread {
 						chart = new ChartVO(id, stockName);
 						model.addToChartList(chart);
 						System.out.println("Worker: Async calling model for creating " + id + " whith new stock value " + stockValue + " from time " + this.model.millisToHHMM(Long.parseLong(timeStamp)));
-						updateModelAsync(chart, this.model.millisToHHMM(Long.parseLong(timeStamp)), stockValue);
+//						updateModelAsync(chart, this.model.millisToHHMM(Long.parseLong(timeStamp)), stockValue);
+						updateModelAsync(chart, timeStamp, stockValue); 
 					}
 				}
 				
